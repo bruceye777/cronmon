@@ -6,7 +6,8 @@ crython 是一个计划任务（定时任务）监控系统，可以对循环执
 
 许可: `GNU GPLv3 <https://www.gnu.org/licenses/gpl-3.0.html>`__
 
-![travis](https://travis-ci.org/bruceye777/cronmon.svg?branch=master)
+.. image:: https://travis-ci.org/bruceye777/cronmon.svg?branch=master
+    :target: https://travis-ci.org/bruceye777/cronmon
 
 安装
 ~~~~
