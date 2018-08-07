@@ -1,0 +1,9 @@
+recursive-include cronmon/conf *
+recursive-include cronmon/static *
+recursive-include cronmon/templates *
+recursive-include docs *
+include *.py
+include *.ini
+include *.txt
+include LICENSE
+include README.md

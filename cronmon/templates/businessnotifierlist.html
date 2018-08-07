@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}业务通知人查询{% endblock %}
+{% block navbar %}
+    <section class="content-header">
+        <h1>业务通知人查询</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">业务通知人管理</li>
+            <li class="active">业务通知人查询</li>
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            {% include 'message.html' %}
+        </div>
+
+        <div class="box-body">
+
+            <form id="BusinessNotifierSearchForm" action="/businessnotifierlist" method="get">
+                {{ form2.hidden_tag() }}
+
+                <div class="box-body">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            {{ form2.search_content(class_="form-control",placeholder="请输入") }}
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            {{ form2.search_by(class_="form-control",placeholder="请输入") }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            {{ form2.submit(class_="btn btn-primary pull-right") }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            {% if form %}
+                <table class="table table-striped">
+                    <tr>
+                        <th>业务</th>
+                        <th>通知人姓名</th>
+                        <th>编辑</th>
+                        <th>删除</th>
+                    </tr>
+                    {% for row in form.content %}
+                        <tr>
+                            <td>{{ row.business_name }}</td>
+                            <td>{{ row.notify_name }}</td>
+                                <td><a id='bnedit' class='fa fa-lg fa-edit text-light-blue'
+                                       href='{{ url_for("main.businessnotifieredit", id=row.id, bid=row.bid) }}'></a></td>
+                                <td><a id='bndel' class='modalId fa fa-lg fa-trash text-red' href="#" data-id={{ row.id }} data-bid={{ row.bid }}
+                                       data-name="{{ row.business_name + '-' + row.notify_name }}" data-href='{{ url_for("main.businessnotifierlist") }}'
+                                       data-action='del' data-toggle="modal" data-target="#confirm-modal-post"></a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="box-footer clearfix">
+            {% if form %}
+                <ul class="pagination pagination-sm no-margin pull-right">
+                    <li><a href="?page=1&search_content={{ form.search_content }}&search_by={{ form.search_by }}">&laquo;</a></li>
+                    {% for i in range(1, form.total_page + 1) %}
+                        {% if i == form.page %}
+                            <li>
+                                <a href="?page={{ i }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}"><b>{{ i }}</b></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?page={{ i }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <li><a href="?page={{ form.total_page }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}">&raquo;</a></li>
+                </ul>
+            {% endif %}
+        </div>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>显示所有业务通知人的相关信息，每一对业务加通知人为一条记录。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    getModalBodyName();
+    showModal();
+</script>
+{% endblock %}
+

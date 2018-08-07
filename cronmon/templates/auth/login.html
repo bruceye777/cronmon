@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/adminlte/css/AdminLTE.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/iCheck/square/blue.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <title>CRONMON登录</title>
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo">
+        <b>CRONMON</b>
+    </div>
+    <div class="login-box-body">
+        <p class="login-box-msg">输入正确信息然后提交</p>
+        <form id="LoginForm" method="post">
+            {{form.hidden_tag()}}
+            <div class="form-group has-feedback">
+                <strong>{{form.username(class_="form-control",placeholder="用户名")}}</strong>
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <strong>{{form.password(class_="form-control",placeholder="密码")}}</strong>
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            {% if code %}
+                <div class="form-group has-feedback">
+                    <strong>{{form.recaptcha(class_="col-sm-6",placeholder="验证码")}}</strong>
+                    <img id='recaptcha' src="{{url_for('auth.get_code')}}"/>
+                </div>
+            {%  endif %}
+            {% include 'message.html' %}
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="checkbox icheck">
+                        <label>
+                            {{form.rememberme()}}{{form.rememberme.label}}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-4">
+                    {{form.submit(class_="btn btn-primary btn-block btn-flat")}}
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='plugins/jQuery/jquery-2.2.3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/iCheck/icheck.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/global/global.js') }}"></script>
+<script>
+    $('input').iCheck({
+        checkboxClass: 'icheckbox_square-blue',
+        radioClass: 'iradio_square-blue',
+        increaseArea: '20%'
+    });
+</script>
+</body>
+</html>

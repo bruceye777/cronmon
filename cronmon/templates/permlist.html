@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}权限管理{% endblock %}
+{% block navbar %}
+    <section class="content-header">
+        <h1>权限管理</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">系统管理</li>
+            <li class="active">权限管理</li>
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            {% include 'message.html' %}
+        </div>
+
+        <div class="box-body">
+
+            <form id="PermSearchForm" action="/permlist" method="get">
+                {{ form2.hidden_tag() }}
+
+                <div class="box-body">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            {{ form2.search_content(class_="form-control",placeholder="请输入") }}
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            {{ form2.search_by(class_="form-control",placeholder="请输入") }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            {{ form2.submit(class_="btn btn-primary pull-right") }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            {% if form %}
+                <table class="table table-striped">
+                    <tr>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>电话</th>
+                        <th>角色</th>
+                        <th>启用</th>
+                        <th>用户权限</th>
+                        <th>密码重置</th>
+                        <th>业务权限</th>
+                        <th>删除</th>
+                    </tr>
+                    {% for row in form.content %}
+                        <tr>
+                            <td>{{ row.username }}</td>
+                            <td>{{ row.email }}</td>
+                            <td>{{ row.phone }}</td>
+                            <td>
+                                {% if row.admin %}
+                                    <span>系统管理员</span>
+                                {% else %}
+                                    <span>业务管理员</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if row.status %}
+                                    <a class='fa fa-check-square-o'></a>
+                                {% else %}
+                                    <a class='fa fa-square-o'></a>
+                                {% endif %}
+                            </td>
+                            <td><a id='pedit' class='fa fa-lg fa-edit text-light-blue'
+                                   href='{{ url_for("main.permedit", id=row.uid) }}'></a></td>
+                            <td><a id='pwreset' class='fa fa-lg fa-edit text-light-blue'
+                                   href='{{ url_for("main.passwordreset", id=row.uid) }}'></a></td>
+                            {% if row.perm_list != '0' %}
+                                <td><a id='pbedit' class='fa fa-lg fa-edit text-light-blue'
+                                       href='{{ url_for("main.permbizedit", id=row.id, uid=row.uid) }}'></a></td>
+                                <td><a id='pdel' class='modalId fa fa-lg fa-trash text-red' href="#" data-id={{ row.uid }} data-bid={{ row.id }}
+                                       data-name="{{ row.username }}" data-href='{{ url_for("main.permlist") }}'
+                                       data-action='del' data-toggle="modal" data-target="#confirm-modal-post"></a></td>
+                            {% else %}
+                                <td><a class='fa fa-lg fa-lock text-light-blue'></a></td>
+                                <td><a class='fa fa-lg fa-ban text-red'></a></td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="box-footer clearfix">
+            {% if form %}
+                <ul class="pagination pagination-sm no-margin pull-right">
+                    <li><a href="#">&laquo;</a></li>
+                    {% for i in range(1, form.total_page+ 1) %}
+                        {% if i == form.page %}
+                            <li>
+                                <a href="?page={{ i }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}"><b>{{ i }}</b></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?page={{ i }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <li><a href="#">&raquo;</a></li>
+                </ul>
+            {% endif %}
+        </div>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>显示所有系统用户的相关信息。</li>
+                    <li>角色如果为‘系统管理员’，因为拥有所有业务权限，则不提供业务权限编辑入口。</li>
+                    <li>角色如果为‘系统管理员’，目前不允许进行删除。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    getModalBodyName();
+    showModal();
+</script>
+{% endblock %}

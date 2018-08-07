@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}业务查询{% endblock %}
+{% block navbar %}
+    <section class="content-header">
+        <h1>业务查询</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">业务管理</li>
+            <li class="active">业务查询</li>
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+<div class="box box-primary">
+    <div class="box-header with-border">
+        {% include 'message.html' %}
+    </div>
+    <div class="box-body">
+        <form id="BusinessSearchForm" action="/businesslist" method="get">
+            {{ form2.hidden_tag() }}
+            <div class="box-body">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        {{ form2.search_content(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        {{ form2.search_by(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        {{ form2.submit(class_="btn btn-primary pull-right") }}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        {% if form %}
+            <table class="table table-striped">
+                <tr>
+                    <th>业务</th>
+                    <th>启用</th>
+                    {% if current_user.is_admin() %}
+                        <th>编辑</th>
+                        <th>删除</th>
+                    {% endif %}
+                </tr>
+                {% for row in form.content %}
+                    <tr>
+                        <td>{{ row.business_name }}</td>
+                        <td>
+                            {% if row.status %}
+                                <a class='fa fa-check-square-o'></a>
+                            {% else %}
+                                <a class='fa fa-square-o'></a>
+                            {% endif %}
+                        </td>
+                        {% if current_user.is_admin() %}
+                            <td><a id='bedit' class='fa fa-lg fa-edit text-light-blue' href='{{ url_for("main.businessedit", id=row.id) }}'></a></td>
+                            <td><a id='bdel' class='modalId fa fa-lg fa-trash text-red' href="#" data-id={{ row.id }} data-bid={{ row.id }}
+                                   data-name="{{ row.business_name }}" data-href="{{ url_for("main.businesslist") }}"
+                                   data-action='del' data-toggle="modal" data-target="#confirm-modal-post"></a></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+
+    <div class="box-footer clearfix">
+        {% if form %}
+            <ul class="pagination pagination-sm no-margin pull-right">
+                <li><a href="?page=1&search_content={{ form.search_content }}&search_by={{ form.search_by }}">&laquo;</a>
+                </li>
+                {% for i in range(1, form.total_page + 1) %}
+                    {% if i == form.page %}
+                        <li>
+                            <a href="?page={{ i }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}"><b>{{ i }}</b></a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="?page={{ i }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                <li>
+                    <a href="?page={{ form.total_page }}&search_content={{ form.search_content }}&search_by={{ form.search_by }}">&raquo;</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+    <div class="info-footer">
+        <div class="well">
+            <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+            <ol>
+                <li>显示所有业务的相关信息。</li>
+                <li>如果删除业务，则会删除对应业务的业务通知人和监控任务。</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    getModalBodyName();
+    showModal();
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}通知人配置{% endblock %}
+
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>通知人配置</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">通知人管理</li>
+            <li class="active">通知人配置</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <form id="NotifyEditForm" method="post">
+            {{ form.hidden_tag() }}
+            <div class="box-header with-border">
+                {% include 'message.html' %}
+            </div>
+
+            <div class="box-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.notify_name.label }}</label>
+                        {{ form.notify_name(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.notify_email.label }}</label>
+                        {{ form.notify_email(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.notify_tel.label }}</label>
+                        {{ form.notify_tel(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="col-md-12">
+                    {{ form.status() }}
+                    {{ form.submit(class_="btn btn-primary pull-right") }}
+                </div>
+            </div>
+        </form>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>通知人为‘禁用’状态，则所不会出现在告警通知人对象中。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    switch_value = $('#status')[0].checked;
+    $('#status').bootstrapSwitch({
+        state: switch_value,
+        onColor: 'success',
+        offColor: 'danger',
+        onText: '生效',
+        offText: '失效'
+    });
+</script>
+{% endblock %}

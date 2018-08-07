@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}监控任务配置{% endblock %}
+
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>监控任务配置</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">监控任务管理</li>
+            <li class="active">监控任务配置</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <form id="TaskEditForm" method="post">
+            {{ form.hidden_tag() }}
+            <div class="box-header with-border">
+                {% include 'message.html' %}
+            </div>
+
+            <div class="box-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.name.label }}</label>
+                        {{ form.name(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.url.label }}</label>
+                        {{ form.url(class_="form-control",placeholder="请输入",readonly=true) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.period.label }}</label>
+                        {{ form.period(class_="form-control",placeholder="基于传统crontab格式 '* * * * *' ") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.grace_time.label }}</label>
+                        {{ form.grace_time(class_="form-control",placeholder="至少为1") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.business.label }}</label>
+                        {{ form.business(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="col-md-12">
+                    {{ form.status() }}
+                    {{ form.submit(class_="btn btn-primary pull-right") }}
+                </div>
+            </div>
+        </form>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>监控URL为自动生成，无需填写，完整URL会添加上URL公共部分。</li>
+                    <li>监控任务为‘启用’状态，且所属业务也为‘启用’状态才进行告警，‘禁用’状态则不告警。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    switch_value = $('#status')[0].checked;
+    $('#status').bootstrapSwitch({
+        state: switch_value,
+        onColor: 'success',
+        offColor: 'danger',
+        onText: '生效',
+        offText: '失效'
+    });
+</script>
+{% endblock %}

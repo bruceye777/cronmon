@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/adminlte/css/AdminLTE.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/adminlte/css/skins/skin-purple.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/bootstrap-switch/bootstrap-switch.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/font-awesome/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/iCheck/all.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/ionicons/css/ionicons.min.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <title>CRONMON | {% block title %}TITLE{% endblock %}</title>
+    {% block head %}{% endblock %}
+    {% block css %}{% endblock %}
+</head>
+
+<body class="hold-transition skin-purple sidebar-mini fixed">
+<div class="wrapper">
+    <header class="main-header">
+        <a href="{{ url_for('main.index') }}" class="logo">
+            <span class="logo-mini"><b>N</b></span>
+            <span class="logo-lg"><b>CRONMON</b></span>
+        </a>
+        <nav class="navbar navbar-static-top">
+            <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown user user-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            {% if current_user.admin %}
+                                <img src="{{ url_for('static', filename='images/superAdmin.jpg') }}" class="user-image"
+                                     alt="User Image">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/bizAdmin.jpg') }}" class="user-image"
+                                     alt="User Image">
+                            {% endif %}
+                            <span class="hidden-xs">{{ current_user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="user-header">
+                                {% if current_user.admin %}
+                                    <img src="{{ url_for('static', filename='images/superAdmin.jpg') }}"
+                                         class="img-circle" alt="User Image">
+                                    <p>
+                                        <span>系统管理员</span>
+                                    </p>
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/bizAdmin.jpg') }}"
+                                         class="img-circle" alt="User Image">
+                                    <p>
+                                        <span>业务管理员</span>
+                                    </p>
+                                {% endif %}
+                                <p>
+                                    <small>{{ current_user.email }}</small>
+                                </p>
+                            </li>
+                            <li class="user-footer">
+                                <div class="pull-left">
+                                    <a href="{{ url_for('main.passwordchange') }}" class="btn btn-default btn-flat">密码修改</a>
+                                </div>
+                                <div class="pull-right">
+                                    <a href="{{ url_for('auth.logout') }}" class="btn btn-default btn-flat">退出登录</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <aside class="main-sidebar">
+        <section class="sidebar">
+            <ul class="sidebar-menu" data-widget="tree">
+                <li class="header">功能导航</li>
+                <li>
+                    <a href="{{ url_for('main.index') }}">
+                        <i class="fa fa-home"></i>
+                        <span>首页</span>
+                    </a>
+                </li>
+                {% if current_user.is_admin() %}
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-briefcase"></i>
+                            <span>业务管理</span>
+                            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="{{ url_for('main.businessedit') }}"><i class="fa fa-circle-o"></i> 新增</a></li>
+                            <li><a href="{{ url_for('main.businesslist') }}"><i class="fa fa-circle-o"></i> 查询</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-user"></i>
+                        <span>通知人管理</span>
+                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                    </a>
+                    <ul class="treeview-menu">
+                        {% if current_user.is_admin() %}
+                            <li><a href="{{ url_for('main.notifyedit') }}"><i class="fa fa-circle-o"></i> 新增</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('main.notifylist') }}"><i class="fa fa-circle-o"></i> 查询</a></li>
+                    </ul>
+                </li>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-balance-scale"></i>
+                        <span>业务通知人管理</span>
+                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="{{ url_for('main.businessnotifieredit') }}"><i class="fa fa-circle-o"></i> 新增</a></li>
+                        <li><a href="{{ url_for('main.businessnotifierlist') }}"><i class="fa fa-circle-o"></i> 查询</a></li>
+                    </ul>
+                </li>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-tasks"></i>
+                        <span>任务管理</span>
+                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="{{ url_for('main.taskedit') }}"><i class="fa fa-circle-o"></i> 新增</a></li>
+                        <li><a href="{{ url_for('main.tasklist') }}"><i class="fa fa-circle-o"></i> 查询</a></li>
+                    </ul>
+                </li>
+                {% if current_user.is_admin() %}
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-coffee"></i>
+                            <span>系统管理</span>
+                            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="{{ url_for('main.permedit') }}"><i class="fa fa-circle-o"></i> 新增</a></li>
+                            <li><a href="{{ url_for('main.permlist') }}"><i class="fa fa-circle-o"></i> 查询</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </section>
+    </aside>
+    <div class="content-wrapper">
+        {% block navbar %}{% endblock %}
+        <section class="content">
+            {% block content %}{% endblock %}
+        </section>
+    </div>
+    <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+            <b>版本号</b> 1.0.0
+        </div>
+        Copyright &copy; <strong>2017-2018 Bruce Ye QQ:844928346</strong>.版权所有
+    </footer>
+    <div class="modal fade" id="confirm-modal-post" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">删除确认</h4>
+                </div>
+                <div class="modal-body">
+                    <p>你正在删除如下记录，是否继续？</p>
+                    <p id="modal-body-name"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">保留</button>
+                    <a id="delmodal" class="btn btn-danger btn-ok" data-action='del'>删除</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='plugins/jQuery/jquery-2.2.3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/bootstrap-switch/bootstrap-switch.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/adminlte/js/adminlte.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/chartjs/Chart.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/global/global.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/iCheck/icheck.min.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

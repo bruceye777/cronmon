@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}监控任务日志查询{% endblock %}
+{% block navbar %}
+    <section class="content-header">
+        <h1>监控任务日志查询</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">监控任务管理</li>
+            <li class="active">监控任务查询</li>
+            <li class="active">监控任务日志查看</li>
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            {% include 'message.html' %}
+        </div>
+
+        <div class="box-body">
+            {% if form %}
+                <table class="table table-striped">
+                    <tr>
+                        <th>发生时间</th>
+                        <th>客户端ip</th>
+                        <th>客户端类型</th>
+                    </tr>
+                    {% for row in form.content %}
+                        <tr>
+                            <td>{{ row.create_datetime }}</td>
+                            <td>{{ row.client_ip }}</td>
+                            <td>{{ row.user_agent }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="box-footer clearfix">
+            {% if form %}
+                <ul class="pagination pagination-sm no-margin pull-right">
+                    <li><a href="#">&laquo;</a></li>
+                    {% for i in range(1, form.total_page+ 1) %}
+                        {% if i == form.page %}
+                            <li><a href="?id={{ form.task_id }}&bid={{ form.bid }}&page={{ i }}"><b>{{ i }}</b></a></li>
+                        {% else %}
+                            <li><a href="?id={{ form.task_id }}&bid={{ form.bid }}&page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li><a href="#">&raquo;</a></li>
+                </ul>
+            {% endif %}
+        </div>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>仅显示最新1000条监控任务日志信息。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}

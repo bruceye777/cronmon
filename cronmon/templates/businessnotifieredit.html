@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}业务通知人配置{% endblock %}
+
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>业务通知人配置</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">业务通知人管理</li>
+            <li class="active">业务通知人配置</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <form id="BusinessNotifierEditForm" method="post">
+            {{ form.hidden_tag() }}
+            <div class="box-header with-border">
+                {% include 'message.html' %}
+            </div>
+
+            <div class="box-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.business.label }}</label>
+                        {{ form.business(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.notifier.label }}</label>
+                        {{ form.notifier(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="col-md-12">
+                    {{ form.submit(class_="btn btn-primary pull-right") }}
+                </div>
+            </div>
+        </form>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>新增时，‘禁用’业务和‘禁用’通知人不会出现在下拉列表中。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}

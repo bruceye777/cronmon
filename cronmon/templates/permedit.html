@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}用户权限配置{% endblock %}
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>用户权限配置</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">权限管理</li>
+            <li class="active">用户权限配置</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <form id="PermEditForm" method="post">
+            {{ form.hidden_tag() }}
+            <div class="box-header with-border">
+                {% include 'message.html' %}
+            </div>
+
+            <div class="box-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.username.label }}</label>
+                        {{ form.username(class_="form-control",placeholder="请输入",readonly=false) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.password.label }}</label>
+                        {{ form.password(class_="form-control",placeholder="请输入",type="password",readonly=true) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.email.label }}</label>
+                        {{ form.email(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.phone.label }}</label>
+                        {{ form.phone(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.api_username.label }}</label>
+                        {{ form.api_username(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.api_password.label }}</label>
+                        {{ form.api_password(type="password",class_="form-control",placeholder="请输入",onclick="show()") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.admin.label }}</label>
+                        {{ form.admin() }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.status.label }}</label>
+                        {{ form.status() }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="col-md-12">
+                    {{ form.submit(class_="btn btn-primary pull-right") }}
+                </div>
+            </div>
+        </form>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>新增时，初始密码会由系统生成，后续可自行更改密码。</li>
+                    <li>API密码在数据库中为明文储存方式。</li>
+                    <li>如果角色是‘系统管理员’，则拥有所有权限。</li>
+                    <li>如果角色不是‘系统管理员’（’业务管理员’），则只拥有对应业务的操作权限。</li>
+                    <li>如果用户为‘禁用’状态，则用户无法登录系统。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    switch_value = $('#status')[0].checked;
+    $('#status').bootstrapSwitch({
+        state: switch_value,
+        onColor: 'success',
+        offColor: 'danger',
+        onText: '启用',
+        offText: '禁用'
+    });
+
+    switch_value = $('#admin')[0].checked;
+    $('#admin').bootstrapSwitch({
+        state: switch_value,
+        onColor: 'success',
+        offColor: 'danger',
+        onText: '是',
+        offText: '否'
+    });
+
+    function show() {
+        var pwd = document.getElementById("api_password");
+        if (pwd.type == "password") {
+            pwd.type = "text";
+        }
+        else {
+            pwd.type = "password";
+        }
+    }
+</script>
+{% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}业务配置{% endblock %}
+
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>业务配置</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">业务管理</li>
+            <li class="active">业务配置</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <form id="BusinessEditForm" method="post">
+            {{ form.hidden_tag() }}
+            <div class="box-header with-border">
+                {% include 'message.html' %}
+            </div>
+
+            <div class="box-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ form.business_name.label }}</label>
+                        {{ form.business_name(class_="form-control",placeholder="请输入") }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="col-md-12">
+                    {{ form.status() }}
+                    {{ form.submit(class_="btn btn-primary pull-right") }}
+                </div>
+            </div>
+        </form>
+        <div class="info-footer">
+            <div class="well">
+                <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                <ol>
+                    <li>业务为‘禁用’状态，则所属监控任务不进行告警。</li>
+                    <li>如果将业务从‘启用’更改为‘禁用’，则所属所有监控任务将被全部禁用；反之则不做任何操作。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    switch_value = $('#status')[0].checked;
+    $('#status').bootstrapSwitch({
+        state: switch_value,
+        onColor: 'success',
+        offColor: 'danger',
+        onText: '生效',
+        offText: '失效'
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!--时间相关信息计算-->
+    {{ moment.include_jquery() }}
+    {{ moment.include_moment() }}
+    {{ moment.lang("zh-CN") }}
+{%  endblock %}
+
+{% block title %}首页{% endblock %}
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>首页</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">首页</li>
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-lg-3 col-xs-6">
+                    <div class="info-box bg-green">
+                        <span class="info-box-icon"><i class="ion ion-ios-book"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">业务统计</span>
+                            <span class="info-box-number">{{ form.business.0 }}</span>
+                            <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                            {% if form.business.0 > form.business.1 %}
+                                {% set value_icon='fa fa-caret-up' %}
+                            {% elif form.business.0 < form.business.1 %}
+                                {% set value_icon='fa fa-caret-down' %}
+                            {% else %}
+                                {% set value_icon='fa fa-caret-right' %}
+                            {% endif %}
+                            <span class="progress-description">在过去的30天里 <i class="{{ value_icon }}"></i> {{ form.business.2 }} %</span>
+                         </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div class="info-box bg-blue">
+                        <span class="info-box-icon"><i class="ion ion-ios-body"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">业务通知人统计</span>
+                            <span class="info-box-number">{{ form.businessnotifier.0 }}</span>
+                            <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                            {% if form.businessnotifier.0 > form.businessnotifier.1 %}
+                                {% set value_icon2='fa fa-caret-up' %}
+                            {% elif form.businessnotifier.0 < form.businessnotifier.1 %}
+                                {% set value_icon2='fa fa-caret-down' %}
+                            {% else %}
+                                {% set value_icon2='fa fa-caret-right' %}
+                            {% endif %}
+                            <span class="progress-description">在过去的30天里 <i class="{{ value_icon2 }}"></i> {{ form.businessnotifier.2 }} %</span>
+                         </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div class="info-box bg-red">
+                        <span class="info-box-icon"><i class="ion ion-ios-heart-outline"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">监控任务统计</span>
+                            <span class="info-box-number">{{ form.taskmonitor.0 }}</span>
+                            <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                            {% if form.taskmonitor.0 > form.taskmonitor.1 %}
+                                {% set value_icon3='fa fa-caret-up' %}
+                            {% elif form.taskmonitor.0 < form.taskmonitor.1 %}
+                                {% set value_icon3='fa fa-caret-down' %}
+                            {% else %}
+                                {% set value_icon3='fa fa-caret-right' %}
+                            {% endif %}
+                            <span class="progress-description">在过去的30天里 <i class="{{ value_icon }}"></i> {{ form.taskmonitor.2 }} %</span>
+                         </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div class="info-box bg-yellow">
+                        <span class="info-box-icon"><i class="ion ion-ios-recording"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">监控日志统计</span>
+                            <span class="info-box-number">{{ form.taskmonitorlog.0 }}</span>
+                            <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                            {% if form.taskmonitorlog.0 > form.taskmonitorlog.1 %}
+                                {% set value_icon4='fa fa-caret-up' %}
+                            {% elif form.taskmonitorlog.0 < form.taskmonitorlog.1 %}
+                                {% set value_icon4='fa fa-caret-down' %}
+                            {% else %}
+                                {% set value_icon4='fa fa-caret-right' %}
+                            {% endif %}
+                            <span class="progress-description">在过去的30天里 <i class="{{ value_icon }}"></i> {{ form.taskmonitorlog.2 }} %</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                  <div class="chart">
+                    <canvas id="areaChart" style="height: 360px;"></canvas>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-footer">
+            <div class="col-lg-6 col-xs-12">
+                <div class="info-box">
+                    <h4><i class="icon fa fa-info"></i> 登录信息</h4>
+                    <ol>
+                        <li>欢迎你，{{ current_user.username }}！</li>
+                        <li>当前本地时间是{{ moment(current_time).format('LLL') }}。</li>
+                        <li>你打开本页面是在{{ moment(current_time).fromNow(refresh=True) }}。</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="col-lg-6 col-xs-12">
+                <div class="info-box">
+                    <h4><i class="icon fa fa-info"></i> 温馨提示</h4>
+                    <ol>
+                        <li>统计数据显示‘inf %’表示对比基准数据为0。</li>
+                        <li>统计数据向上箭头表示增加，向下箭头表示减少，向右箭头表示持平。</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    //图表数据填充和相关设置
+    new Chart(document.getElementById("areaChart"), {
+        type: 'line',
+        data: {
+            labels: {{ form.list_dt }},
+            datasets: [{
+                data: {{ form.list_request_tasks_all }},
+                label: "/tasks/all",
+                backgroundColor : "rgba(60, 141, 188, 0.2)",
+                pointRadius: 1,
+                fill: true
+            }, {
+                data: {{ form.list_request_tasks }},
+                label: "/tasks",
+                backgroundColor : "rgba(210,14,22,0.2)",
+                pointRadius: 1,
+                fill: true
+            }
+            ]
+        },
+        options: {
+            title: {
+                display: true,
+                text: '最近12个月API请求数量'
+            },
+            spanGaps:true,
+            tooltips: {
+                mode: 'index'
+            }
+        }
+    });
+</script>
+{% endblock %}
