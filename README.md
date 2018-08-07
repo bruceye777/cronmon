@@ -1,2 +1,0 @@
-# cronmon
-Cron jobs monitoring.
