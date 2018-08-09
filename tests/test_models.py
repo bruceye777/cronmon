@@ -3,7 +3,6 @@
 """
 from datetime import datetime
 import pytest
-import pymysql
 from werkzeug.security import generate_password_hash
 from cronmon.models import Business, Notifier, BusinessNotifier, TaskMonitor, TaskMonitorLog, Permission, User
 
@@ -72,7 +71,7 @@ class TestUserAndPermission:
             user = User(username='test3', email='test3@cronmon.com', phone='13912340003')
             user.save()
         except:
-            print(user.id,user.username,user.password)
+            print(user.id, user.username, user.password)
         assert user.password is None
 
 
