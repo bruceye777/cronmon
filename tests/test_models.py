@@ -72,7 +72,8 @@ class TestUserAndPermission:
             user = User(username='test3', email='test3@cronmon.com', phone='13912340003')
             user.save()
         except:
-            print(user.id)
+            print(user.id,user.username,user.password)
+        print(user.id,user.username,user.password)
         assert user.id is None
 
 
