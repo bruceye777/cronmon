@@ -22,4 +22,4 @@ before_script:
   - python migrate.py sample
   - sudo service nginx restart
 script:
-  - pytest
+  - python -m pytest
