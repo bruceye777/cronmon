@@ -68,10 +68,12 @@ class TestUserAndPermission:
 
     def test_password_is_nullable(self):
         """Test null password."""
-        with pytest.raises(Exception) as excinfo:
+        try:
             user = User(username='test3', email='test3@cronmon.com', phone='13912340003')
             user.save()
-        assert "Field 'password' doesn't have a default value" in str(excinfo.value)
+        except:
+            print(user.id)
+        assert user.id is None
 
 
 @pytest.mark.usefixtures('db')
