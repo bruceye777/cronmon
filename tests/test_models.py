@@ -3,6 +3,7 @@
 """
 from datetime import datetime
 import pytest
+import peewee
 from werkzeug.security import generate_password_hash
 from cronmon.models import Business, Notifier, BusinessNotifier, TaskMonitor, TaskMonitorLog, Permission, User
 
@@ -67,7 +68,7 @@ class TestUserAndPermission:
 
     def test_password_is_nullable(self):
         """Test null password."""
-        with pytest.raises(Exception):
+        with pytest.raises(peewee.InternalError):
             user = User(username='test3', email='test3@cronmon.com', phone='13912340003')
             user.save()
 
