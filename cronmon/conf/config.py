@@ -43,6 +43,7 @@ class Config:
 class DevelopmentConfig(Config):
     """开发环境配置"""
     DEBUG = True
+    MAIL_SUPPRESS_SEND = True
 
 
 class TestingConfig(Config):
