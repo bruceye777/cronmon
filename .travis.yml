@@ -21,5 +21,6 @@ before_script:
   - python migrate.py init
   - python migrate.py sample
   - sudo service nginx restart
+  - mysql -e 'desc cronmon.user'
 script:
   - python -m pytest
