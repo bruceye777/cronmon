@@ -9,7 +9,7 @@ class Config:
     DB_PASSWD = 'cronmon_pwd'  # 数据库密码
     DB_DATABASE = 'cronmon'  # 数据库名
     ITEMS_PER_PAGE = 10  # 每页显示记录数
-    URL_ROOT = 'https://cronmon.yoursite.io/api/monlink/'  # 监控URL公共部分
+    URL_ROOT = 'http://cronmon.yoursite.io/api/monlink/'  # 监控URL公共部分
     VALIDATE_CODE_USE = False  # 登陆时是否开启验证码
     MAIL_SERVER = 'smtp.yoursite.io'  # 邮件SMTP服务器
     MAIL_PORT = 465  # 邮件服务器端口
