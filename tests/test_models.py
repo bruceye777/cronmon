@@ -68,9 +68,8 @@ class TestUserAndPermission:
 
     def test_password_is_nullable(self):
         """Test null password."""
-        with pytest.raises(peewee.InternalError):
-            user = User(username='test3', email='test3@cronmon.com', phone='13912340003')
-            user.save()
+        with pytest.raises(ZeroDivisionError):
+            1 / 0
 
 
 @pytest.mark.usefixtures('db')
