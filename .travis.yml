@@ -13,7 +13,7 @@ addons:
     - cronmon.yoursite.io
 before_install:
   - mysql -e 'create database cronmon;'
-  - mysql -e 'grant select,insert,update,delete on cronmon.* to cronmon_user@127.0.0.1 identified by cronmon_pwd;'
+  - mysql -e 'grant select,insert,update,delete on cronmon.* to cronmon_user@127.0.0.1 identified by "cronmon_pwd";'
 install:
   - pip install -r requirements.txt
   - sudo cp tests/cronmon_test.conf /etc/nginx/conf.d/
