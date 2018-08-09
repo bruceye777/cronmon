@@ -2,9 +2,24 @@ language: python
 python:
   - "3.4"
   - "3.6"
+sudo: required
+services:
+  - mysql
+addons:
+  apt:
+    packages:
+      - nginx
+  hosts:
+    - cronmon.yoursite.io
+before_install:
+  - mysql -e 'create database cronmon;'
+  - mysql -e 'grant select,insert,update,delete on cronmon.* to cronmon_user@127.0.0.1 identified by cronmon_pwd;'
 install:
   - pip install -r requirements.txt
-script: true
-after_success:
-  - travis_retry pip install coveralls
-  - coveralls
+  - sudo cp tests/cronmon_test.conf /etc/nginx/conf.d/
+before_script:
+  - python migrate.py init
+  - python migrate.py sample
+  - sudo service nginx restart
+script:
+  - py.test
