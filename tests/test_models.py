@@ -73,8 +73,7 @@ class TestUserAndPermission:
             user.save()
         except:
             print(user.id,user.username,user.password)
-        print(user.id,user.username,user.password)
-        assert user.id is None
+        assert user.password is None
 
 
 @pytest.mark.usefixtures('db')
