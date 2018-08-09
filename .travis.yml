@@ -12,7 +12,7 @@ addons:
   hosts:
     - cronmon.yoursite.io
 before_install:
-  - mysql -e 'create database cronmon;'
+  - mysql -e 'create database `cronmon` /*!40100 DEFAULT CHARACTER SET utf8 */;'
   - mysql -e 'grant all on cronmon.* to cronmon_user@127.0.0.1 identified by "cronmon_pwd";'
 install:
   - pip install -r requirements.txt
