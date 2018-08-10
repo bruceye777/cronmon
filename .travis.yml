@@ -24,6 +24,7 @@ before_script:
   - python migrate.py init
   - python migrate.py sample
   - sudo service nginx restart
+  - echo "var:"$FLASK_CONFIG
 script:
   - python -m pytest --verbose --cov=cronmon --cov-report=term-missing
 after_success:
