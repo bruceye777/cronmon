@@ -47,6 +47,7 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     """测试环境配置"""
+    MAIL_SUPPRESS_SEND = True
     TESTING = True
 
 
