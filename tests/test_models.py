@@ -65,16 +65,6 @@ class TestUserAndPermission:
         assert user.verify_api_password('test5_api_wrongpwd') is False
 
 
-    def test_password_is_nullable(self):
-        """Test null password."""
-        try:
-            user = User(username='test3', email='test3@cronmon.com', phone='13912340003')
-            user.save()
-        except:
-            print(user.id, user.username, user.password)
-        assert user.password is None
-
-
 @pytest.mark.usefixtures('db')
 class TestBusinessAndNotifier:
     """Business and notifier tests."""
