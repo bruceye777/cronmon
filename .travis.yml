@@ -3,6 +3,9 @@ python:
   - "3.4"
   - "3.6"
 sudo: required
+env:
+  global:
+    - FLASK_CONFIG = "testing"
 services:
   - mysql
 addons:
@@ -21,6 +24,7 @@ before_script:
   - python migrate.py init
   - python migrate.py sample
   - sudo service nginx restart
-  - mysql -e 'desc cronmon.user'
 script:
-  - python -m pytest
+  - python -m pytest --verbose --cov=cronmon --cov-report=term-missing
+after_success:
+  - coveralls
