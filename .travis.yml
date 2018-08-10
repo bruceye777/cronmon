@@ -27,4 +27,5 @@ before_script:
 script:
   - python -m pytest --verbose --cov=cronmon --cov-report=term-missing
 after_success:
+  - travis_retry pip install coveralls
   - coveralls
