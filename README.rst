@@ -9,6 +9,9 @@ crython 是一个计划任务（定时任务）监控系统，可以对循环执
 .. image:: https://travis-ci.org/bruceye777/cronmon.svg?branch=master
     :target: https://travis-ci.org/bruceye777/cronmon
 
+.. image:: https://coveralls.io/repos/github/bruceye777/cronmon/badge.svg?branch=master
+    :target: https://coveralls.io/github/bruceye777/cronmon?branch=master
+
 安装
 ~~~~
 
