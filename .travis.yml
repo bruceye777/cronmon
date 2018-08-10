@@ -5,7 +5,7 @@ python:
 sudo: required
 env:
   global:
-    - FLASK_CONFIG=testing
+    - FLASK_CONFIG="testing"
 services:
   - mysql
 addons:
