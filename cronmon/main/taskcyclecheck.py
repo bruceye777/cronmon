@@ -26,20 +26,17 @@ def taskcyclecheck():
         id = obj.id
         period = obj.period
         grace_time = int(obj.grace_time) * 60
+        last_check_time = obj.last_check_time
         next_check_time = obj.next_check_time
         create_datetime = obj.create_datetime
         warning = obj.warning
 
         # 任务上次检查时间（last_check_time）初始化（如果为空值，则以任务创建时间为值）
-        try:
-            TaskMonitorLog.select().where(TaskMonitorLog.taskmon == id)\
-                .order_by(TaskMonitorLog.id.desc()).get().create_datetime
-        except:
-            last_check_time = create_datetime
-            query0 = TaskMonitor.update(last_check_time=last_check_time).where(TaskMonitor.id == id)
+        if not last_check_time:
+            query0 = TaskMonitor.update(last_check_time=create_datetime).where(TaskMonitor.id == id)
             query0.execute()
 
-        # next_check_time init 任务下次检查时间初始化（如果为空值，则以计算出的next_check_datetime为值）
+        # 任务下次检查时间（next_check_time init）初始化（如果为空值，则以计算出的next_check_datetime为值）
         entry = CronTab(period)
         add = int(entry.next(default_utc=False))
         next_check_timestamp = current_timestamp + add + grace_time
