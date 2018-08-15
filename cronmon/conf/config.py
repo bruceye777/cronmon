@@ -17,7 +17,7 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')  # 邮件服务器登录用户名
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')  # 邮件服务器登录密码
     MAIL_MAX_EMAILS = 5  # 一次连接中发送的最大邮件数
-    MAIL_DEFAULT_SENDER = 'cronMon <sendmail@yoursite.io>'  # 发件人显示名称和地址
+    MAIL_DEFAULT_SENDER = 'CRONMON <sendmail@yoursite.io>'  # 发件人显示名称和地址
     # 后台循环任务，job1为crontab监控检查任务，job2为空业务检查任务
     JOBS = [
         {
