@@ -102,9 +102,11 @@ def taskcyclecheck():
 def emptybusinesscheck():
     """获取没有联系人的业务，并同时发给系统管理员和对应的业务管理员"""
 
-    # 获取空联系人业务信息
+    # 获取空联系人业务信息，如果结果为空，则退出后续检查
     subq = BusinessNotifier.select().where(BusinessNotifier.business_id == Business.id)
     query1 = Business.select().where((~fn.EXISTS(subq)) & (Business.status == True))
+    if not query1:
+        return
 
     # 获取管理员列表
     query2 = User.select().where((User.admin == True) & (User.status == True))
