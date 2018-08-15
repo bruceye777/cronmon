@@ -188,8 +188,8 @@ def form_edit(db_model, form, template, form2=False):
 
     # 修改操作（id存在）
     if id:
-        # 如果是指定model，则记录操作前对应值
-        if db_model == Business:
+        # 如果是指定model，则记录操作前对应字段值
+        if db_model == Business or db_model == TaskMonitor:
             status_old = db_model.select().where(db_model.id == id).get().status
         if db_model == User:
             admin_old = db_model.select().where(db_model.id == id).get().admin
@@ -209,8 +209,8 @@ def form_edit(db_model, form, template, form2=False):
                     if not biz_status:
                         flash('关联业务为禁用状态')
                         return redirect(url_for(redirect_path_edit))
-                # 如果是指定model，则记录表单提交前值
-                if db_model == Business:
+                # 如果是指定model，则记录表单提交前指定字段值
+                if db_model == Business or db_model == TaskMonitor:
                     status_new = form.status.data
                 if db_model == User:
                     admin_new = form.admin.data
@@ -221,6 +221,11 @@ def form_edit(db_model, form, template, form2=False):
                 if db_model == Business:
                     if status_old != status_new and status_new is False:
                         toupdate = (TaskMonitor.update({TaskMonitor.status: False}).where(TaskMonitor.business == id))
+                        toupdate.execute()
+                # 如果监控任务状态从启用变为禁用，则对应的告警状态会被重置
+                if db_model == TaskMonitor:
+                    if status_old != status_new and status_new is False:
+                        toupdate = (TaskMonitor.update({TaskMonitor.warning: False}).where(TaskMonitor.id == id))
                         toupdate.execute()
                 # 如果修改用户角色，则进行关联表相关操作
                 # 如果从业务管理员到系统管理员，则将perm_list修改为0
@@ -461,6 +466,9 @@ def task_list(db_model, db_model2, form, template):
         query_all = query_string('where', 'db_model', search_by, search_content, 'db_model2')
     else:
         query_all = query_string('orderby', 'db_model', model2='db_model2')
+
+    # 任务列表不采用按id排序，而是按照warning和status倒序排序，即处于告警的，启用状态的任务在前
+    query_all = query_all.replace('db_model.id', 'db_model.warning.desc(), db_model.status.desc()')
 
     # 模版字典生成（form2为查询表单）
     query, total_count = query_limit(eval(query_all), True, perm_list, page, length)
