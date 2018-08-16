@@ -4,8 +4,6 @@ cronmon
 crython 是一个计划任务（定时任务）监控系统，可以对循环执行的程序和脚本进行监控告警，当其未按照预期执行时，发送邮件到对应邮箱进行通知。
 同时可以将监控任务划分到不同业务下面，每个业务可以分配不同的通知人，建立业务、通知人和监控任务的多层级关系。
 
-许可: `GNU GPLv3 <https://www.gnu.org/licenses/gpl-3.0.html>`__
-
 .. image:: https://travis-ci.org/bruceye777/cronmon.svg?branch=master
     :target: https://travis-ci.org/bruceye777/cronmon
 
@@ -39,6 +37,14 @@ crython 是一个计划任务（定时任务）监控系统，可以对循环执
         $ python migrate.py sample  # 样例数据插入
 
 .. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/init.png
+
+启停程序
+~~~~~~~~
+
+.. code:: bash
+
+        $ uwsgi cronmon.ini&  # 启动程序
+        $ uwsgi --stop /var/run/uwsgi_cronmon.pid  # 停止程序
 
 使用
 ~~~~
