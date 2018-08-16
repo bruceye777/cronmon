@@ -190,9 +190,15 @@ def form_edit(db_model, form, template, form2=False):
     if id:
         # 如果是指定model，则记录操作前对应字段值
         if db_model == Business or db_model == TaskMonitor:
-            status_old = db_model.select().where(db_model.id == id).get().status
+            try:
+                status_old = db_model.select().where(db_model.id == id).get().status
+            except:
+                abort(500)
         if db_model == User:
-            admin_old = db_model.select().where(db_model.id == id).get().admin
+            try:
+                admin_old = db_model.select().where(db_model.id == id).get().admin
+            except:
+                abort(500)
         # 权限检查
         if not (bid in perm_list or perm_list == ['0']):
             abort(403)

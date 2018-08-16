@@ -569,7 +569,7 @@ class TestStatusSwitch:
         assert u'您已退出登录' in res
         login(testapp, 'userJustForTest', 'userJustForTest')
         res = testapp.get('https://'+SITE_URL+'/taskedit?id=999&bid=999', expect_errors=True)
-        assert res.status_int == 403
+        assert res.status_int == 500
         res = testapp.get('https://'+SITE_URL+'/tasklistwrong', expect_errors=True)
         assert res.status_int == 404
 
