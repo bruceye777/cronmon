@@ -133,7 +133,7 @@ class TaskFormNew(TaskForm):
 
 class TaskSearchForm(SearchForm):
     """任务搜索表单"""
-    search_by = SelectField('搜索项', choices=[('business_name', '业务名'), ('url', '监控URL'), ('name', '任务名')])
+    search_by = SelectField('搜索项', choices=[('name', '任务名'), ('url', '监控URL'), ('business_name', '业务名')])
 
 
 class PermissionForm(FlaskForm):
