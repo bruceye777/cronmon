@@ -496,7 +496,6 @@ def tasklog_list(db_model, template):
     """任务日志列表模版渲染
 
     :param db_model: 数据库model
-    :param db_model2: 关联数据库model
     :param template: 模版
     :return: 渲染后的模版
     """
@@ -505,7 +504,9 @@ def tasklog_list(db_model, template):
     action, id, bid, page, length, search_content, search_by, perm_list = get_parm()
 
     # 模版字典生成（join 'Business' model是因为query_limit函数需要使用Business.id）
-    query_all = 'db_model.select().where(db_model.taskmon_id==id).order_by(db_model.id.desc()).limit(1000)'
+    query_all = 'db_model.select().join(TaskMonitor, on=(TaskMonitorLog.taskmon_id == TaskMonitor.id))' \
+                '.join(Business, on=(TaskMonitor.business == Business.id))' \
+                '.where(TaskMonitor.id==id).order_by(db_model.id.desc()).limit(1000)'
     query, total_count = query_limit(eval(query_all), True, perm_list, page, length)
     item = "{'id': obj.id, 'client_ip': obj.client_ip, 'user_agent': obj.user_agent, " \
            "'create_datetime': obj.create_datetime}"

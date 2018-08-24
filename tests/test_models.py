@@ -158,9 +158,9 @@ class TestTaskonitorAndLog:
         assert isinstance(taskmonitor.business, Business)
 
         taskmonitor_log = TaskMonitorLog(occur_time=datetime.now(),
-                                         client_ip='1.2.3.4', user_agent='Curl', taskmon=taskmonitor.id)
+                                         client_ip='1.2.3.4', user_agent='Curl', taskmon_id=taskmonitor.id)
         taskmonitor_log.save()
         assert isinstance(taskmonitor_log.occur_time, datetime)
         assert isinstance(taskmonitor_log.client_ip, str)
         assert isinstance(taskmonitor_log.user_agent, str)
-        assert isinstance(taskmonitor_log.taskmon, TaskMonitor)
+        assert isinstance(taskmonitor_log.taskmon_id, int)
