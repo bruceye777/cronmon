@@ -156,7 +156,7 @@ class TaskMonitorLog(BaseModel):
     create_datetime = DateTimeField(default=datetime.now)  # 请求发生时间
     client_ip = CharField()  # 客户端ip
     user_agent = CharField()  # 客户端类型
-    taskmon = ForeignKeyField(TaskMonitor, related_name='tsk')  # 关联监控任务
+    taskmon_id = IntegerField()  # 关联监控任务（此处未使用外键，考虑到插入速度和mysql分区）
 
 
 class ApiRequestLog(BaseModel):
@@ -167,6 +167,7 @@ class ApiRequestLog(BaseModel):
     url = CharField()  # 请求URL
     method = CharField()  # 请求方法
     code = IntegerField()  # 响应代码
+    user_id = IntegerField()  # 关联监控任务（此处未使用外键，考虑到插入速度和mysql分区）
 
 
 class AnonymousUser(AnonymousUserMixin):

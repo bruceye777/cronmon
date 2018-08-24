@@ -58,9 +58,11 @@ def data_count(db_model, biz_perm):
             total_query = total_query.where(Business.id.in_(biz_perm))
             total_query_before30 = total_query_before30.where(Business.id.in_(biz_perm))
         elif db_model == TaskMonitorLog:
-            total_query = total_query.join(TaskMonitor).join(Business).where(Business.id.in_(biz_perm))
-            total_query_before30 = total_query_before30.join(TaskMonitor)\
-                .join(Business).where(Business.id.in_(biz_perm))
+            total_query = total_query.join(TaskMonitor, on=(TaskMonitorLog.taskmon_id == TaskMonitor.id))\
+                .join(Business, on=(TaskMonitor.business == Business.id)).where(Business.id.in_(biz_perm))
+            total_query_before30 = total_query_before30\
+                .join(TaskMonitor, on=(TaskMonitorLog.taskmon_id == TaskMonitor.id))\
+                .join(Business, on=(TaskMonitor.business == Business.id)).where(Business.id.in_(biz_perm))
         else:
             total_query = total_query.join(Business).where(Business.id.in_(biz_perm))
             total_query_before30 = total_query_before30.join(Business).where(Business.id.in_(biz_perm))
@@ -164,6 +166,8 @@ def perm_check(action, *pospara):
         if request.method == 'POST' and id and (bid in biz_perm or biz_perm == ['0']):
             try:
                 db_model.get(db_model.id == id).delete_instance(recursive=True)
+                if db_model == TaskMonitor:
+                    TaskMonitorLog.delete().where(TaskMonitorLog.taskmon_id == id).execute()
                 flash('删除成功')
             except:
                 flash('删除失败')
@@ -488,7 +492,7 @@ def task_list(db_model, db_model2, form, template):
     return render_template(template, form=dict, form2=form, current_user=current_user, prefix=prefix)
 
 
-def tasklog_list(db_model, db_model2, template):
+def tasklog_list(db_model, template):
     """任务日志列表模版渲染
 
     :param db_model: 数据库model
@@ -501,8 +505,7 @@ def tasklog_list(db_model, db_model2, template):
     action, id, bid, page, length, search_content, search_by, perm_list = get_parm()
 
     # 模版字典生成（join 'Business' model是因为query_limit函数需要使用Business.id）
-    query_all = 'db_model.select().join(db_model2).join(Business).' \
-                'where(db_model2.id==id).order_by(db_model.id.desc()).limit(1000)'
+    query_all = 'db_model.select().where(db_model.taskmon_id==id).order_by(db_model.id.desc()).limit(1000)'
     query, total_count = query_limit(eval(query_all), True, perm_list, page, length)
     item = "{'id': obj.id, 'client_ip': obj.client_ip, 'user_agent': obj.user_agent, " \
            "'create_datetime': obj.create_datetime}"
@@ -735,7 +738,7 @@ def taskedit():
 @login_required
 def taskloglist():
     """任务日志列表路由函数"""
-    return tasklog_list(TaskMonitorLog, TaskMonitor, 'taskloglist.html')
+    return tasklog_list(TaskMonitorLog, 'taskloglist.html')
 
 
 @main.route('/permlist', methods=['GET', 'POST'])

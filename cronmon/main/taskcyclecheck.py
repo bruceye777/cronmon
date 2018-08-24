@@ -59,7 +59,7 @@ def taskcyclecheck():
             try:
                 # 查找TaskMonitorLog的记录，如果有大于上次检查时间的记录存在，则将其赋值给last_check_time_new
                 last_check_time_new = TaskMonitorLog.select()\
-                    .where(TaskMonitorLog.taskmon == id, TaskMonitorLog.create_datetime > last_check_datetime2)\
+                    .where(TaskMonitorLog.taskmon_id == id, TaskMonitorLog.create_datetime > last_check_datetime2)\
                     .order_by(TaskMonitorLog.id.desc()).get().create_datetime
                 # 如果之前warning值为True，则将其更改为False，生成邮件相关信息，同时写入数据库和日志
                 if warning:

@@ -14,6 +14,11 @@ CFG = get_config()
 @api_1_0.after_request
 def after_request(response):
     """请求之后，记录日志，根据需要选择记录输出到文件或数据库"""
+    try:
+        user_id = g.current_user.id
+    except:
+        return response
+
     client_ip = str(request.remote_addr)
     user_agent = request.user_agent.string
     url = request.url.replace(request.url_root, '/')
@@ -21,7 +26,7 @@ def after_request(response):
     code = str(response.status_code)
 
     # 如果需要记录到日志文件，可以取消注释LOGGER
-    # msg = ' - '.join((client_ip, method, url, code, user_agent))
+    # msg = ' - '.join((client_ip, method, url, code, user_agent, user_id))
     # LOGGER.info(msg)
 
     toadd = ApiRequestLog()
@@ -30,6 +35,7 @@ def after_request(response):
     toadd.url = url
     toadd.method = method
     toadd.code = code
+    toadd.user_id = user_id
     toadd.save()
 
     return response
