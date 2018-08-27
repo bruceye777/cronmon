@@ -31,8 +31,12 @@ if [ -f /etc/sysconfig/$sysconfig ]; then
     . /etc/sysconfig/$sysconfig
 fi
 
+# Get cronmon init config.
+. /etc/profile
+
 basedir=/data/cronmon  # Change as needed
-cronmon=${UWSGI-${basedir}/cronmon_venv/bin/uwsgi}  # Change as needed
+venvdir=cronmon_venv  # Change as needed
+cronmon=${UWSGI-${basedir}/${venvdir}/bin/uwsgi}
 prog=`/bin/basename $cronmon`
 conffile=${CONFFILE:-${basedir}/cronmon.ini}
 lockfile=${LOCKFILE:-/var/lock/subsys/cronmon}
@@ -42,8 +46,8 @@ RETVAL=0
 start() {
     echo -n $"Starting $prog: "
     
-    cd /data/cronmon
-    daemon --pidfile=${pidfile} ${cronmon} --ini ${conffile}
+    cd ${basedir}  # for mule config file
+    daemon --pidfile ${pidfile} ${cronmon} --venv ${basedir}/${venvdir} --ini ${conffile}
     RETVAL=$?
     echo
     [ $RETVAL = 0 ] && touch ${lockfile}
