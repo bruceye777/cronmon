@@ -8,7 +8,7 @@ BEGIN
         DECLARE RETROWS INT;
         SELECT COUNT(1) INTO RETROWS
         FROM information_schema.partitions
-        WHERE table_schema = SCHEMANAME AND table_name = TABLENAME AND partition_description >= FUTURETIMESTAMP;
+        WHERE table_schema = SCHEMANAME AND table_name = TABLENAME AND UNIX_TIMESTAMP(STR_TO_DATE(SUBSTRING(CONVERT(partition_description, CHAR),2,19), '%Y-%m-%d %H:%i:%s')) >= UNIX_TIMESTAMP(FUTURETIMESTAMP);
 
         IF RETROWS = 0 THEN
                 /*
