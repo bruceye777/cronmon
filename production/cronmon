@@ -95,7 +95,7 @@ case "$1" in
         reload
         ;;
     *)
-        echo $"Usage: $prog {start|stop|restart|reload|status|help}"
+        echo $"Usage: cronmon {start|stop|restart|reload|status|help}"
         RETVAL=2
 esac
 

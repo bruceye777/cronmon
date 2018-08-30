@@ -4,6 +4,9 @@ cronmon
 crython 是一个计划任务（定时任务）监控系统，可以对循环执行的程序和脚本进行监控告警，当其未按照预期执行时，发送邮件到对应邮箱进行通知。
 同时可以将监控任务划分到不同业务下面，每个业务可以分配不同的通知人，建立业务、通知人和监控任务的多层级关系。
 
+通过以一定的间隔发送HTTPS请求到特定的URL实现监控。如果URL未按时接受到请求，对应的业务通知人则会收到告警。
+你可以监控你的数据库备份和安全扫描等关键性任务。
+
 .. image:: https://travis-ci.org/bruceye777/cronmon.svg?branch=master
     :target: https://travis-ci.org/bruceye777/cronmon
 
@@ -45,6 +48,13 @@ crython 是一个计划任务（定时任务）监控系统，可以对循环执
 
         $ uwsgi cronmon.ini&  # 启动程序
         $ uwsgi --stop /var/run/uwsgi_cronmon.pid  # 停止程序
+
+如果将cronmon安装成服务（使用production/cronmon文件）
+
+.. code:: bash
+
+        $ service cronmon start  # 启动程序
+        $ service cronmon stop  # 停止程序
 
 使用
 ~~~~
@@ -93,6 +103,81 @@ crython 是一个计划任务（定时任务）监控系统，可以对循环执
 -  业务管理员（普通用户）操作界面，业务通知人和任务可以查询编辑，通知人仅限查询；
 
 .. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/normalUser.png
+
+
+API调用
+~~~~~~~
+
+获取所有监控任务
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/apiTasksAll.png
+
+按指定关键字获取任务(业务名、任务名和任务URL）
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/apiTasksTaskname.png
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/apiTasksBizname.png
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/apiTasksUrl.png
+
+公共参数包括page（显示第几页）和length（每页显示多少记录）
+
+
+如何使用监控链接
+~~~~~~~~~~~~~~~~
+
+-  crontab写法
+
+.. code:: bash
+
+        # system status check
+        20 * * * * cd /path/to/systemStatusCheck && ./systemStatusCheck.sh > systemStatusCheck.sh.cron.log 2>&1 && curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.apowogame.com/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx >> systemStatusCheck.sh.cron.log 2>&1
+
+-  bash写法
+
+.. code:: bash
+
+        $ curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.apowogame.com/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+-  python写法
+
+.. code:: python
+
+        >>> import requests
+        >>> requests.get('https://cronmon.yoursite.io/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')
+
+生产环境
+~~~~~~~~
+
+-  服务启停
+
+以CentOS为例，首先编辑相关变量
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/serviceManageConfig.png
+
+.. code:: bash
+
+        $ service cronmon help
+        Usage: cronmon {start|stop|restart|reload|status|help}
+        $ chkconfig --level 35 cronmon on  # 加入开机启动
+
+-  日志分区
+
+针对日志表数据，为了方便管理和提高效率，使用mysql分区，首先导入存储过程创建sql文件（production/cronmonPartition.sql），
+脚本首先修改表结构，添加了复合主键（id+create_datetime），然后创建了所需的5个存储过程，脚本基于zabbix分区创建脚本进行修改
+（链接https://www.zabbix.org/wiki/Docs/howto/mysql_partition#MySQL_Database_Partitioning），执行脚本后结果如下：
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/mysqlPartitionTableStructure.png
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/mysqlPartitionProcedures.png
+
+对应的shell脚本
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/mysqlPartitionShellScript.png
+
+对应的crontab配置
+
+.. code:: bash
+
+        # cronmon mysql partition
+        15 0 * * * cd /path/to/cronmonMysqlPartition && ./cronmonMysqlPartition.sh > cronmonMysqlPartition.sh.cron.log 2>&1 && curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.yoursite.io/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx >> cronmonMysqlPartition.sh.cron.log 2>&1
 
 数据库结构变更
 ~~~~~~~~~~~~~~

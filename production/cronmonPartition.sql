@@ -1,3 +1,7 @@
+--  Create composite primary key
+ALTER TABLE apirequestlog DROP PRIMARY KEY, ADD PRIMARY KEY(id,create_datetime);
+ALTER TABLE taskmonitorlog DROP PRIMARY KEY, ADD PRIMARY KEY(id,create_datetime);
+
 DELIMITER $$
 CREATE PROCEDURE `partition_create`(SCHEMANAME varchar(64), TABLENAME varchar(64), PARTITIONNAME varchar(64), FUTURETIMESTAMP timestamp)
 BEGIN
