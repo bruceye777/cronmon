@@ -124,18 +124,20 @@ API调用
 如何使用监控链接
 ~~~~~~~~~~~~~~~~
 
+在不同情况下调用任务监控URL的写法
+
 -  crontab写法
 
 .. code:: bash
 
         # system status check
-        20 * * * * cd /path/to/systemStatusCheck && ./systemStatusCheck.sh > systemStatusCheck.sh.cron.log 2>&1 && curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.apowogame.com/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx >> systemStatusCheck.sh.cron.log 2>&1
+        20 * * * * cd /path/to/systemStatusCheck && ./systemStatusCheck.sh > systemStatusCheck.sh.cron.log 2>&1 && curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.yoursite.io/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx >> systemStatusCheck.sh.cron.log 2>&1
 
 -  bash写法
 
 .. code:: bash
 
-        $ curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.apowogame.com/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        $ curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.yoursite.io/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 -  python写法
 
@@ -152,6 +154,8 @@ API调用
 以CentOS为例，首先编辑相关变量
 
 .. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/serviceManageConfig.png
+
+然后将启动脚本（production/cronmon）放入/etc/init.d目录
 
 .. code:: bash
 
