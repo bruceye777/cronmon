@@ -155,7 +155,7 @@ API调用
 
 .. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/serviceManageConfig.png
 
-然后将启动脚本（production/cronmon）放入/etc/init.d目录
+然后将启动脚本（production/init.d/cronmon）放入/etc/init.d目录
 
 .. code:: bash
 
@@ -182,6 +182,18 @@ API调用
 
         # cronmon mysql partition
         15 0 * * * cd /path/to/cronmonMysqlPartition && ./cronmonMysqlPartition.sh > cronmonMysqlPartition.sh.cron.log 2>&1 && curl -kfsS --retry 3 --connect-timeout 10 --ipv4 https://cronmon.yoursite.io/api/monlink/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx >> cronmonMysqlPartition.sh.cron.log 2>&1
+
+-  WebService配置
+
+以nginx为例
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/nginxConfig.png
+
+-  日志轮转
+
+以logrotate为例
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/logRotate.png
 
 数据库结构变更
 ~~~~~~~~~~~~~~

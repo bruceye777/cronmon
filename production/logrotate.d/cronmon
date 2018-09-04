@@ -1,0 +1,9 @@
+/var/log/uwsgi_cronmon.log {
+        daily
+        dateext
+        missingok
+        rotate 30
+        notifempty
+        copytruncate 
+        create 640 root root
+}
