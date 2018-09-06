@@ -1,0 +1,6 @@
+/build/
+/dist/
+*.pyc
+__pycache__/
+cronmon.egg-info/
+cronmon_venv/
