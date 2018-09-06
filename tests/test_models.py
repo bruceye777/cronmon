@@ -129,7 +129,7 @@ class TestTaskonitorAndLog:
         assert retrieved == taskmonitor
 
         taskmonitor_log = TaskMonitorLog(occur_time=datetime.now(), client_ip='1.2.3.4', user_agent='Curl',
-                                         taskmon=taskmonitor.id)
+                                         taskmon_id=taskmonitor.id)
         taskmonitor_log.save()
         retrieved = TaskMonitorLog.get_by_id(taskmonitor_log.id)
         assert retrieved == taskmonitor_log

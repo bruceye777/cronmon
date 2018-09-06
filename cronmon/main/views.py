@@ -477,8 +477,8 @@ def task_list(db_model, db_model2, form, template):
     else:
         query_all = query_string('orderby', 'db_model', model2='db_model2')
 
-    # 任务列表不采用按id排序，而是按照warning和status倒序排序，即处于告警的，启用状态的任务在前
-    query_all = query_all.replace('db_model.id', 'db_model.warning.desc(), db_model.status.desc()')
+    # 任务列表不采用按id排序，而是按照warning和status倒序排序，即处于告警的，禁用状态的任务在前
+    query_all = query_all.replace('db_model.id', 'db_model.warning.desc(), db_model.status, db_model.id')
 
     # 模版字典生成（form2为查询表单）
     query, total_count = query_limit(eval(query_all), True, perm_list, page, length)
