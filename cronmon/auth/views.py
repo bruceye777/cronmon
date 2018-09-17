@@ -39,7 +39,7 @@ def before_request():
     if current_user.is_authenticated and request.endpoint[5:] == 'logout':
         request_log()
 
-    url_prefix = CFG.URL_ROOT.split('/')[0]+'//'+CFG.URL_ROOT.split('/')[2]
+    url_prefix = CFG.URL_ROOT.split('/')[2]
     url_check = request.headers.get("Referer")
 
     if not url_check:
