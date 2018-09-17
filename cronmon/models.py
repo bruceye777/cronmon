@@ -4,6 +4,7 @@ import string
 import uuid
 from datetime import datetime
 from flask_login import UserMixin, AnonymousUserMixin
+from itsdangerous import URLSafeSerializer
 from peewee import __exception_wrapper__
 from playhouse.migrate import MySQLDatabase, MySQLMigrator, Model, CharField, DateTimeField, IntegerField, \
     BooleanField, ForeignKeyField, OperationalError
@@ -37,6 +38,12 @@ class RetryDB(RetryOperationalError, MySQLDatabase):
 CFG = config[os.getenv('FLASK_CONFIG') or 'default']
 DB = RetryDB(host=CFG.DB_HOST, user=CFG.DB_USER, passwd=CFG.DB_PASSWD, database=CFG.DB_DATABASE)
 MIGRATOR = MySQLMigrator(DB)
+SERIALIZER = URLSafeSerializer(CFG.SECRET_KEY)
+
+
+def session_token_generate():
+    """随机session token生成"""
+    return SERIALIZER.dumps(str(uuid.uuid1()))
 
 
 class BaseModel(Model):
@@ -57,6 +64,7 @@ class User(UserMixin, BaseModel):
     api_username = CharField(unique=True, null=True)  # API用户名
     api_password = CharField(null=True)  # API密码
     create_datetime = DateTimeField(default=datetime.now)  # 创建时间
+    session_token = CharField(unique=True, default=session_token_generate)  # 随机session token
 
     @property
     def password_hash(self):
@@ -93,6 +101,9 @@ class User(UserMixin, BaseModel):
     def is_anonymous(self):
         """对是否匿名返回‘False’"""
         return False
+
+    def get_id(self):
+        return self.session_token
 
 
 class Permission(BaseModel):
@@ -134,7 +145,7 @@ class BusinessNotifier(BaseModel):
 class TaskMonitor(BaseModel):
     """任务model"""
     name = CharField(unique=True)  # 监控任务名
-    url = CharField()  # 监控URL
+    url = CharField(unique=True)  # 监控URL
     period = CharField()  # 循环周期
     grace_time = IntegerField(default=0)  # 超时时间，以分钟为单位
     status = BooleanField(default=True)  # 生效失效标识
@@ -185,9 +196,13 @@ login_manager.anonymous_user = AnonymousUser
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(session_token):
     """用户回调"""
-    return User.get(User.id == int(user_id))
+    try:
+        user = User.get(User.session_token == session_token)
+        return user
+    except:
+        return None
 
 
 if __name__ == '__main__':

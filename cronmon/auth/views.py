@@ -1,9 +1,11 @@
+import random
+import string
 from datetime import timedelta
 from io import BytesIO
-from flask import render_template, redirect, request, url_for, flash, current_app, session
+from flask import render_template, redirect, request, url_for, flash, current_app, session, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from cronmon import get_logger, get_config
-from cronmon.models import User
+from cronmon.models import User, session_token_generate
 from cronmon.utils import create_validate_code
 from . import auth
 from .forms import LoginForm
@@ -37,6 +39,14 @@ def before_request():
     if current_user.is_authenticated and request.endpoint[5:] == 'logout':
         request_log()
 
+    url_prefix = CFG.URL_ROOT.split('/')[0]+'//'+CFG.URL_ROOT.split('/')[2]
+    url_check = request.headers.get("Referer")
+
+    if not url_check:
+        url_check = url_prefix
+    if not url_check.startswith(url_prefix):
+        abort(403)
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -67,8 +77,11 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
-    """登出路由函数"""
+    """登出路由函数，登出时重写session token，确保session失效"""
+    user = User.get(User.id == current_user.id)
     logout_user()
+    user.session_token = session_token_generate()
+    user.save()
     flash('您已退出登录')
     return redirect(url_for('auth.login'))
 

@@ -35,10 +35,19 @@ def after_request(response):
 
 @main.before_request
 def before_request():
-    """请求之前，判断用户是否正常登录，未通过则返回错误"""
+    """请求之前，判断用户是否正常登录，未通过则返回错误以及是否是正确的Referer（为空则忽略）"""
     if not current_user.is_anonymous():
         if not current_user.is_active():
             abort(401)
+
+    url_prefix = CFG.URL_ROOT.split('/')[2]
+    url_check = request.headers.get("Referer")
+
+    if not url_check:
+        url_check = url_prefix
+    if not url_check.startswith('http://'+url_prefix) and not url_check.startswith('https://'+url_prefix)\
+            and not url_check.startswith(url_prefix) and not url_check.startswith(url_prefix):
+        abort(403)
 
 
 def data_count(db_model, biz_perm):
@@ -173,6 +182,19 @@ def perm_check(action, *pospara):
                 flash('删除失败')
         else:
             abort(403)
+
+
+def get_form_validate(form):
+    """GET表单校验
+
+    :param form: 被校验表单
+    :return: 通过校验后的实例化表单
+    """
+    form = form(request.args)
+    if request.method == 'GET' and form.submit.data and not form.validate():
+        abort(403)
+
+    return form
 
 
 def form_edit(db_model, form, template, form2=False):
@@ -364,6 +386,9 @@ def business_list(db_model, form, template):
     # 获取请求参数和用户权限
     action, id, bid, page, length, search_content, search_by, perm_list = get_parm()
 
+    # 表单校验（GET请求）
+    form = get_form_validate(form)
+
     # 删除操作权限检查
     perm_check(action, id, bid, perm_list, db_model)
 
@@ -394,6 +419,9 @@ def notify_list(db_model, form, template):
 
     # 获取请求参数和用户权限
     action, id, bid, page, length, search_content, search_by, perm_list = get_parm()
+
+    # 表单校验（GET请求）
+    form = get_form_validate(form)
 
     # 删除操作权限检查
     perm_check(action, id, bid, perm_list, db_model)
@@ -427,6 +455,9 @@ def business_notifier_list(db_model, db_model2, form, template):
 
     # 获取请求参数和用户权限
     action, id, bid, page, length, search_content, search_by, perm_list = get_parm()
+
+    # 表单校验（GET请求）
+    form = get_form_validate(form)
 
     # 删除操作权限检查
     perm_check(action, id, bid, perm_list, BusinessNotifier)
@@ -465,6 +496,9 @@ def task_list(db_model, db_model2, form, template):
     # 获取请求参数和用户权限以及监控URL公共部分
     action, id, bid, page, length, search_content, search_by, perm_list = get_parm()
     prefix = CFG.URL_ROOT
+
+    # 表单校验（GET请求）
+    form = get_form_validate(form)
 
     # 删除操作权限检查
     perm_check(action, id, bid, perm_list, db_model)
@@ -528,6 +562,9 @@ def perm_list(db_model, db_model2, form, template):
 
     # 获取请求参数和用户权限以及监控URL公共部分
     action, id, bid, page, length, search_content, search_by, perm_list = get_parm()
+
+    # 表单校验（GET请求）
+    form = get_form_validate(form)
 
     # 删除操作权限检查
     perm_check(action, id, bid, perm_list, db_model2)
@@ -681,7 +718,7 @@ def index():
 @admin_required
 def businesslist():
     """业务列表路由函数（仅限超级管理员访问）"""
-    return business_list(Business, BusinessSearchForm(), 'businesslist.html')
+    return business_list(Business, BusinessSearchForm, 'businesslist.html')
 
 
 @main.route('/businessedit', methods=['GET', 'POST'])
@@ -696,7 +733,7 @@ def businessedit():
 @login_required
 def notifylist():
     """联系人列表路由函数"""
-    return notify_list(Notifier, NotifierSearchForm(), 'notifylist.html')
+    return notify_list(Notifier, NotifierSearchForm, 'notifylist.html')
 
 
 @main.route('/notifyedit', methods=['GET', 'POST'])
@@ -711,7 +748,7 @@ def notifyedit():
 @login_required
 def businessnotifierlist():
     """业务和通知人列表路由函数"""
-    return business_notifier_list(Business, Notifier, BusinessNotifierSearchForm(), 'businessnotifierlist.html')
+    return business_notifier_list(Business, Notifier, BusinessNotifierSearchForm, 'businessnotifierlist.html')
 
 
 @main.route('/businessnotifieredit', methods=['GET', 'POST'])
@@ -725,7 +762,7 @@ def businessnotifieredit():
 @login_required
 def tasklist():
     """任务列表路由函数"""
-    return task_list(TaskMonitor, Business, TaskSearchForm(), 'tasklist.html')
+    return task_list(TaskMonitor, Business, TaskSearchForm, 'tasklist.html')
 
 
 @main.route('/taskedit', methods=['GET', 'POST'])
@@ -747,7 +784,7 @@ def taskloglist():
 @admin_required
 def permlist():
     """用户权限列表路由函数（仅限超级管理员访问）"""
-    return perm_list(Permission, User, PermissionSearchForm(), 'permlist.html')
+    return perm_list(Permission, User, PermissionSearchForm, 'permlist.html')
 
 
 @main.route('/permedit', methods=['GET', 'POST'])

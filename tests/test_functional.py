@@ -71,7 +71,7 @@ class TestNormalUser:
         login(testapp, 'bizadmin1', 'bizadmin1')
 
         # Create operation
-        res = testapp.get(url_for('main.businessnotifieredit', _external=True)) 
+        res = testapp.get(url_for('main.businessnotifieredit', _external=True))
         form = res.forms['BusinessNotifierEditForm']
         form['business'] = '3'
         form['notifier'] = '1'
