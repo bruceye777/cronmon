@@ -44,7 +44,8 @@ def before_request():
 
     if not url_check:
         url_check = url_prefix
-    if not url_check.startswith(url_prefix):
+    if not url_check.startswith('http://'+url_prefix) and not url_check.startswith('https://'+url_prefix)\
+            and not url_check.startswith(url_prefix):
         abort(403)
 
 
