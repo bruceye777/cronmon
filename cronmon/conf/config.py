@@ -11,6 +11,10 @@ class Config:
     ITEMS_PER_PAGE = 10  # 每页显示记录数
     URL_ROOT = 'http://cronmon.yoursite.io/api/monlink/'  # 监控URL公共部分
     VALIDATE_CODE_USE = False  # 登陆时是否开启验证码
+    SESSION_COOKIE_SECURE = False  # session cookie是否仅通过HTTPS发送
+    REMEMBER_COOKIE_SECURE = False  # remember cookie是否仅通过HTTPS发送
+    SESSION_COOKIE_HTTPONLY = True  # 是否允许JavaScrip读取session cookie
+    REMEMBER_COOKIE_HTTPONLY = True  # 是否允许JavaScript读取remember cookie
     MAIL_SERVER = 'smtp.yoursite.io'  # 邮件SMTP服务器
     MAIL_PORT = 465  # 邮件服务器端口
     MAIL_USE_SSL = True  # 邮件服务器是否使用SSL
