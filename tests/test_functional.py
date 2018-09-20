@@ -1,6 +1,6 @@
 """各个功能点路由测试，部分操作按角色（系统管理员和业务管理员）进行分别测试
 此文件测试用例依赖于初始化脚本中的样本数据，如果数据有过更改，则有可能会导致测试失败
-在删除测试中由于未找到webtest如何在模态c中模拟点击，改为直接post请求
+在删除测试中由于未找到webtest如何在模态中模拟点击，改为直接post请求
 """
 import pytest
 from flask import url_for
@@ -9,12 +9,13 @@ from cronmon.models import Permission, User, TaskMonitor
 
 CFG = get_config()
 SITE_URL = CFG.URL_ROOT.split('/')[2]
+SITE_PROTOCOL = CFG.URL_ROOT.split(':')[0]
 
 
 def login(testapp, username, password):
     """Login"""
     # Goes to homepage
-    url = 'https://'+SITE_URL+'/login'
+    url = SITE_PROTOCOL+'://'+SITE_URL+'/login'
     res = testapp.get(url)
     # Fills out login form
     form = res.forms['LoginForm']
@@ -28,7 +29,7 @@ def login(testapp, username, password):
 
 def logout(testapp):
     """Logout"""
-    res = testapp.get(url_for('auth.logout', _external=True)).follow()
+    res = testapp.get(url_for('auth.logout', _external=True, _scheme=SITE_PROTOCOL)).follow()
 
     return res
 
@@ -37,7 +38,8 @@ def delete_post(testapp, submit_form, link_id, post_url):
     """Delete post"""
     post_id = submit_form.html.find(id=link_id).get('data-id')
     post_bid = submit_form.html.find(id=link_id).get('data-bid')
-    post_response = testapp.post(url_for(post_url, _external=True), {'action': 'del', 'id': post_id, 'bid': post_bid})
+    post_response = testapp.post(url_for(post_url, _external=True, _scheme=SITE_PROTOCOL),
+                                 {'action': 'del', 'id': post_id, 'bid': post_bid})
     return post_response
 
 
@@ -71,7 +73,7 @@ class TestNormalUser:
         login(testapp, 'bizadmin1', 'bizadmin1')
 
         # Create operation
-        res = testapp.get(url_for('main.businessnotifieredit', _external=True))
+        res = testapp.get(url_for('main.businessnotifieredit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessNotifierEditForm']
         form['business'] = '3'
         form['notifier'] = '1'
@@ -85,7 +87,7 @@ class TestNormalUser:
         assert u'Duplicate entry' in res
 
         # Retrieve operation
-        res = testapp.get(url_for('main.businessnotifierlist', _external=True)) 
+        res = testapp.get(url_for('main.businessnotifierlist', _external=True, _scheme=SITE_PROTOCOL)) 
         form = res.forms['BusinessNotifierSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'PEOP'
@@ -101,7 +103,7 @@ class TestNormalUser:
         assert u'修改成功' in res
 
         # Delete operation
-        res = testapp.get(url_for('main.businessnotifierlist', _external=True))
+        res = testapp.get(url_for('main.businessnotifierlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessNotifierSearchForm']
         form['search_by'] = 'notify_name'
         form['search_content'] = '慕淑珍'
@@ -114,7 +116,7 @@ class TestNormalUser:
         login(testapp, 'bizadmin1', 'bizadmin1')
 
         # Create operation
-        res = testapp.get(url_for('main.taskedit', _external=True))
+        res = testapp.get(url_for('main.taskedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskEditForm']
         form['name'] = 'testTask1'
         form['period'] = '*/3 * * * *'
@@ -139,7 +141,7 @@ class TestNormalUser:
         assert u'只能包含5个字段' in res
 
         # Retrieve operation
-        res = testapp.get(url_for('main.tasklist', _external=True))
+        res = testapp.get(url_for('main.tasklist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskSearchForm']
         form['search_by'] = 'name'
         form['search_content'] = 'testTask1'
@@ -159,7 +161,7 @@ class TestNormalUser:
         assert res.status_int == 200
 
         # Delete operation
-        res = testapp.get(url_for('main.tasklist', _external=True))
+        res = testapp.get(url_for('main.tasklist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskSearchForm']
         form['search_by'] = 'name'
         form['search_content'] = 'testTask1'
@@ -172,7 +174,7 @@ class TestNormalUser:
         login(testapp, 'bizadmin1', 'bizadmin1')
 
         # Update operation(Password change)
-        res = testapp.get(url_for('main.passwordchange', _external=True))
+        res = testapp.get(url_for('main.passwordchange', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PasswordEditForm']
         form['old_password'] = 'bizadmin1'
         form['new_password'] = 'bizadmin1new'
@@ -186,7 +188,7 @@ class TestNormalUser:
         assert u'当前本地时间' in res
 
         # Update operation(Password change back)
-        res = testapp.get(url_for('main.passwordchange', _external=True))
+        res = testapp.get(url_for('main.passwordchange', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PasswordEditForm']
         form['old_password'] = 'bizadmin1new'
         form['new_password'] = 'bizadmin1'
@@ -204,19 +206,19 @@ class TestNormalUser:
         login(testapp, 'bizadmin1', 'bizadmin1')
 
         # Admin task link
-        res = testapp.get('https://'+SITE_URL+'/businesslist', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/businesslist', expect_errors=True)
         assert res.status_int == 403
-        res = testapp.get('https://'+SITE_URL+'/businessedit', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/businessedit', expect_errors=True)
         assert res.status_int == 403
-        res = testapp.get('https://'+SITE_URL+'/notifyedit', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/notifyedit', expect_errors=True)
         assert res.status_int == 403
-        res = testapp.get('https://'+SITE_URL+'/permlist', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/permlist', expect_errors=True)
         assert res.status_int == 403
-        res = testapp.get('https://'+SITE_URL+'/permedit', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/permedit', expect_errors=True)
         assert res.status_int == 403
-        res = testapp.get('https://'+SITE_URL+'/permbizedit', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/permbizedit', expect_errors=True)
         assert res.status_int == 403
-        res = testapp.get('https://'+SITE_URL+'/passwordreset', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/passwordreset', expect_errors=True)
         assert res.status_int == 403
 
 
@@ -229,7 +231,7 @@ class TestSuperUser:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create operation
-        res = testapp.get(url_for('main.businessedit', _external=True))
+        res = testapp.get(url_for('main.businessedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessEditForm']
         form['business_name'] = 'justForTest'
         res = form.submit().follow()
@@ -241,7 +243,7 @@ class TestSuperUser:
         assert u'Duplicate entry' in res
 
         # Retrieve operation
-        res = testapp.get(url_for('main.businesslist', _external=True))
+        res = testapp.get(url_for('main.businesslist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'justForTest'
@@ -256,7 +258,7 @@ class TestSuperUser:
         assert u'修改成功' in res
 
         # Delete operation
-        res = testapp.get(url_for('main.businesslist', _external=True))
+        res = testapp.get(url_for('main.businesslist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'justForTestAgain'
@@ -269,7 +271,7 @@ class TestSuperUser:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create operation
-        res = testapp.get(url_for('main.notifyedit', _external=True))
+        res = testapp.get(url_for('main.notifyedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['NotifyEditForm']
         form['notify_name'] = 'notifyJustForTest'
         form['notify_email'] = 'notifyJustForTest@cronmon.com'
@@ -286,7 +288,7 @@ class TestSuperUser:
         assert u'Duplicate entry' in res
 
         # Retrieve operation
-        res = testapp.get(url_for('main.notifylist', _external=True))
+        res = testapp.get(url_for('main.notifylist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['NotifySearchForm']
         form['search_by'] = 'notify_name'
         form['search_content'] = 'notifyJustForTest'
@@ -301,7 +303,7 @@ class TestSuperUser:
         assert u'修改成功' in res
 
         # Delete operation
-        res = testapp.get(url_for('main.notifylist', _external=True))
+        res = testapp.get(url_for('main.notifylist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['NotifySearchForm']
         form['search_by'] = 'notify_name'
         form['search_content'] = 'notifyJustForTestAgain'
@@ -314,7 +316,7 @@ class TestSuperUser:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create operation
-        res = testapp.get(url_for('main.businessnotifieredit', _external=True))
+        res = testapp.get(url_for('main.businessnotifieredit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessNotifierEditForm']
         form['business'] = '7'
         form['notifier'] = '6'
@@ -328,7 +330,7 @@ class TestSuperUser:
         assert u'Duplicate entry' in res
 
         # Retrieve operation
-        res = testapp.get(url_for('main.businessnotifierlist', _external=True))
+        res = testapp.get(url_for('main.businessnotifierlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessNotifierSearchForm']
         form['search_by'] = 'notify_name'
         form['search_content'] = '慕淑珍'
@@ -343,7 +345,7 @@ class TestSuperUser:
         assert u'修改成功' in res
 
         # Delete operation
-        res = testapp.get(url_for('main.businessnotifierlist', _external=True))
+        res = testapp.get(url_for('main.businessnotifierlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessNotifierSearchForm']
         form['search_by'] = 'notify_name'
         form['search_content'] = '和建军'
@@ -356,7 +358,7 @@ class TestSuperUser:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create operation
-        res = testapp.get(url_for('main.taskedit', _external=True))
+        res = testapp.get(url_for('main.taskedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskEditForm']
         form['name'] = 'testTask1'
         form['period'] = '*/3 * * * *'
@@ -381,7 +383,7 @@ class TestSuperUser:
         assert u'只能包含5个字段' in res
 
         # Retrieve operation
-        res = testapp.get(url_for('main.tasklist', _external=True))
+        res = testapp.get(url_for('main.tasklist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = '游戏3'
@@ -401,7 +403,7 @@ class TestSuperUser:
         assert res.status_int == 200
 
         # Delete operation
-        res = testapp.get(url_for('main.tasklist', _external=True))
+        res = testapp.get(url_for('main.tasklist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskSearchForm']
         form['search_by'] = 'name'
         form['search_content'] = 'testTask1'
@@ -414,7 +416,7 @@ class TestSuperUser:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create user operation
-        res = testapp.get(url_for('main.permedit', _external=True))
+        res = testapp.get(url_for('main.permedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermEditForm']
         form['username'] = 'userJustForTest'
         form['email'] = 'userJustForTest@cronmon.com'
@@ -436,7 +438,7 @@ class TestSuperUser:
         assert u'Duplicate entry' in res
 
         # Retrieve operation
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTest'
@@ -451,7 +453,7 @@ class TestSuperUser:
         assert u'修改成功' in res
 
         # Update operation(PermBiz)
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTestAgain'
@@ -464,11 +466,11 @@ class TestSuperUser:
         assert u'修改成功' in res
 
         # Incorrect permbiz link
-        res = testapp.get('https://'+SITE_URL+'/permbizedit?id=999&uid=999', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/permbizedit?id=999&uid=999', expect_errors=True)
         assert res.status_int == 500
 
         # Update operation(Password)
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTestAgain'
@@ -489,7 +491,7 @@ class TestSuperUser:
 
         # Delete operation
         login(testapp, 'cronadmin2', 'cronadmin2')
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTestAgain'
@@ -502,7 +504,7 @@ class TestSuperUser:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Update operation(Password change)
-        res = testapp.get(url_for('main.passwordchange', _external=True))
+        res = testapp.get(url_for('main.passwordchange', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PasswordEditForm']
         form['old_password'] = 'cronadmin2'
         form['new_password'] = 'cronadmin2new'
@@ -516,7 +518,7 @@ class TestSuperUser:
         assert u'当前本地时间' in res
 
         # Update operation(Password change back)
-        res = testapp.get(url_for('main.passwordchange', _external=True))
+        res = testapp.get(url_for('main.passwordchange', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PasswordEditForm']
         form['old_password'] = 'cronadmin2new'
         form['new_password'] = 'cronadmin2'
@@ -539,7 +541,7 @@ class TestStatusSwitch:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create user(status is false)
-        res = testapp.get(url_for('main.permedit', _external=True))
+        res = testapp.get(url_for('main.permedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermEditForm']
         form['username'] = 'userJustForTest'
         form['email'] = 'userJustForTest@cronmon.com'
@@ -552,7 +554,7 @@ class TestStatusSwitch:
         assert u'保存成功' in res
 
         # Change password
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTest'
@@ -568,9 +570,9 @@ class TestStatusSwitch:
         res = logout(testapp)
         assert u'您已退出登录' in res
         login(testapp, 'userJustForTest', 'userJustForTest')
-        res = testapp.get('https://'+SITE_URL+'/taskedit?id=999&bid=999', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/taskedit?id=999&bid=999', expect_errors=True)
         assert res.status_int == 500
-        res = testapp.get('https://'+SITE_URL+'/tasklistwrong', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/tasklistwrong', expect_errors=True)
         assert res.status_int == 404
 
         # Logout and login with super user,disable new user
@@ -578,7 +580,7 @@ class TestStatusSwitch:
         assert u'您已退出登录' in res
         login(testapp, 'cronadmin2', 'cronadmin2')
 
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTest'
@@ -599,7 +601,7 @@ class TestStatusSwitch:
 
         # Delete new user
         login(testapp, 'cronadmin2', 'cronadmin2')
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTest'
@@ -612,7 +614,7 @@ class TestStatusSwitch:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create business
-        res = testapp.get(url_for('main.businessedit', _external=True))
+        res = testapp.get(url_for('main.businessedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessEditForm']
         form['business_name'] = 'justForTestStatusSwitch'
         form['status'] = True
@@ -620,7 +622,7 @@ class TestStatusSwitch:
         assert u'保存成功' in res
 
         # Create task
-        res = testapp.get(url_for('main.taskedit', _external=True))
+        res = testapp.get(url_for('main.taskedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskEditForm']
         form['name'] = 'testTaskForStatusSwitch'
         form['period'] = '*/3 * * * *'
@@ -631,7 +633,7 @@ class TestStatusSwitch:
         assert u'保存成功' in res
 
         # Disable business
-        res = testapp.get(url_for('main.businesslist', _external=True))
+        res = testapp.get(url_for('main.businesslist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'justForTestStatusSwitch'
@@ -643,7 +645,7 @@ class TestStatusSwitch:
         assert u'修改成功' in res
 
         # Get task status
-        res = testapp.get(url_for('main.tasklist', _external=True))
+        res = testapp.get(url_for('main.tasklist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskSearchForm']
         form['search_by'] = 'name'
         form['search_content'] = 'testTaskForStatusSwitch'
@@ -658,7 +660,7 @@ class TestStatusSwitch:
         assert u'关联业务为禁用状态' in res
 
         # Enable business
-        res = testapp.get(url_for('main.businesslist', _external=True))
+        res = testapp.get(url_for('main.businesslist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'justForTestStatusSwitch'
@@ -670,7 +672,7 @@ class TestStatusSwitch:
         assert u'修改成功' in res
 
         # Get task status
-        res = testapp.get(url_for('main.tasklist', _external=True))
+        res = testapp.get(url_for('main.tasklist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['TaskSearchForm']
         form['search_by'] = 'name'
         form['search_content'] = 'testTaskForStatusSwitch'
@@ -679,7 +681,7 @@ class TestStatusSwitch:
         assert u'input checked id="status"' not in res
 
         # Delete business
-        res = testapp.get(url_for('main.businesslist', _external=True))
+        res = testapp.get(url_for('main.businesslist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'justForTestStatusSwitch'
@@ -692,7 +694,7 @@ class TestStatusSwitch:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create business
-        res = testapp.get(url_for('main.businessedit', _external=True))
+        res = testapp.get(url_for('main.businessedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessEditForm']
         form['business_name'] = 'justForTestStatusSwitch'
         form['status'] = False
@@ -700,7 +702,7 @@ class TestStatusSwitch:
         assert u'保存成功' in res
 
         # Create notify
-        res = testapp.get(url_for('main.notifyedit', _external=True))
+        res = testapp.get(url_for('main.notifyedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['NotifyEditForm']
         form['notify_name'] = 'notifyJustForTest'
         form['notify_email'] = 'notifyJustForTest@cronmon.com'
@@ -710,12 +712,12 @@ class TestStatusSwitch:
         assert u'保存成功' in res
 
         # Check business and notify
-        res = testapp.get(url_for('main.businessnotifieredit', _external=True))
+        res = testapp.get(url_for('main.businessnotifieredit', _external=True, _scheme=SITE_PROTOCOL))
         assert u'justForTestStatusSwitch' not in res
         assert u'notifyJustForTest' not in res
 
         # Enable business
-        res = testapp.get(url_for('main.businesslist', _external=True))
+        res = testapp.get(url_for('main.businesslist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'justForTestStatusSwitch'
@@ -727,7 +729,7 @@ class TestStatusSwitch:
         assert u'修改成功' in res
 
         # Enable notify
-        res = testapp.get(url_for('main.notifylist', _external=True))
+        res = testapp.get(url_for('main.notifylist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['NotifySearchForm']
         form['search_by'] = 'notify_name'
         form['search_content'] = 'notifyJustForTest'
@@ -739,12 +741,12 @@ class TestStatusSwitch:
         assert u'修改成功' in res
 
         # Check business and notify
-        res = testapp.get(url_for('main.businessnotifieredit', _external=True))
+        res = testapp.get(url_for('main.businessnotifieredit', _external=True, _scheme=SITE_PROTOCOL))
         assert u'justForTestStatusSwitch' in res
         assert u'notifyJustForTest' in res
 
         # Delete business
-        res = testapp.get(url_for('main.businesslist', _external=True))
+        res = testapp.get(url_for('main.businesslist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['BusinessSearchForm']
         form['search_by'] = 'business_name'
         form['search_content'] = 'justForTestStatusSwitch'
@@ -752,7 +754,7 @@ class TestStatusSwitch:
         assert u'删除成功' in res
 
         # Delete notify
-        res = testapp.get(url_for('main.notifylist', _external=True))
+        res = testapp.get(url_for('main.notifylist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['NotifySearchForm']
         form['search_by'] = 'notify_name'
         form['search_content'] = 'notifyJustForTest'
@@ -765,7 +767,7 @@ class TestStatusSwitch:
         login(testapp, 'cronadmin2', 'cronadmin2')
 
         # Create user operation
-        res = testapp.get(url_for('main.permedit', _external=True))
+        res = testapp.get(url_for('main.permedit', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermEditForm']
         form['username'] = 'userJustForTest'
         form['email'] = 'userJustForTest@cronmon.com'
@@ -783,7 +785,7 @@ class TestStatusSwitch:
         assert user_perm == '0'
 
         # Switch(from superuser to normaluser)
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTest'
@@ -798,7 +800,7 @@ class TestStatusSwitch:
         assert user_perm == ''
 
         # Switch(from normaluser to superuser)
-        res = testapp.get(url_for('main.permlist', _external=True))
+        res = testapp.get(url_for('main.permlist', _external=True, _scheme=SITE_PROTOCOL))
         form = res.forms['PermSearchForm']
         form['search_by'] = 'username'
         form['search_content'] = 'userJustForTest'
@@ -822,17 +824,17 @@ class TestApiCall:
         testapp.authorization = ('Basic', ('api_bizadmin2', 'api_bizadmin2'))
 
         # Get user's all tasks
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks/all')
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks/all')
         assert u'tasks' in res
         assert res.status_int == 200
 
         # Get user's  all tasks with query strings
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks/all?page=2&length=2')
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks/all?page=2&length=2')
         assert u'tasks' in res
         assert res.status_int == 200
 
         # Get user's all tasks with query strings(Incorrect page number)
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks/all?page=999', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks/all?page=999', expect_errors=True)
         assert u'Out of Range' in res
         assert res.status_int == 400
 
@@ -840,7 +842,7 @@ class TestApiCall:
         testapp.authorization = ('Basic', ('api_root2', 'api_pwd2'))
 
         # Get user's all tasks
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks/all')
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks/all')
         assert u'tasks' in res
         assert res.status_int == 200
 
@@ -849,27 +851,27 @@ class TestApiCall:
         testapp.authorization = ('Basic', ('api_bizadmin2', 'api_bizadmin2'))
 
         # Get task with keyword taskname
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks?taskname=secondTask')
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks?taskname=secondTask')
         assert u'tasks' in res
         assert res.status_int == 200
 
         # Get task with keyword bizname
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks?bizname=PEOP')
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks?bizname=PEOP')
         assert u'tasks' in res
         assert res.status_int == 200
 
         # Get task with keyword url
         cronmon_url = TaskMonitor.get(TaskMonitor.name == 'thirdTask').url
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks?url='+cronmon_url)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks?url='+cronmon_url)
         assert u'tasks' in res
         assert res.status_int == 200
 
         # Get task with incorrect keyword
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks?biznamewrong=PEOP', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks?biznamewrong=PEOP', expect_errors=True)
         assert res.status_int == 400
 
         # Get task with keyword(no results)
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks?bizname=PEOPwrong', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks?bizname=PEOPwrong', expect_errors=True)
         assert u'No Records' in res
         assert res.status_int == 400
 
@@ -878,13 +880,13 @@ class TestApiCall:
         testapp.authorization = None
         # Send request to monitor url with right link
         cronmon_url = TaskMonitor.get(TaskMonitor.name == 'thirdTask').url
-        res = testapp.get('https://'+SITE_URL+'/api/monlink/'+cronmon_url)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/monlink/'+cronmon_url)
         assert u'OK' in res
         assert res.status_int == 200
 
         # Send request to monitor url with incorrect link
         cronmon_url = 'f9e05ae0-43d2-4753-823a-wrong'
-        res = testapp.get('https://' + SITE_URL + '/api/monlink/' + cronmon_url, expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://' + SITE_URL + '/api/monlink/' + cronmon_url, expect_errors=True)
         assert u'Bad Request' in res
         assert res.status_int == 400
 
@@ -893,7 +895,7 @@ class TestApiCall:
         testapp.authorization = ('Basic', ('api_bizadmin2', 'api_bizadmin2pwd'))
 
         # Get user's all tasks
-        res = testapp.get('https://'+SITE_URL+'/api/v1.0/tasks/all', expect_errors=True)
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/api/v1.0/tasks/all', expect_errors=True)
         assert u'Invalid credentials' in res
         assert res.status_int == 401
 
@@ -906,6 +908,6 @@ class TestOthers:
         testapp.authorization = None
 
         # Get user's all tasks
-        res = testapp.get('https://'+SITE_URL+'/code')
+        res = testapp.get(SITE_PROTOCOL+'://'+SITE_URL+'/code')
         assert u'image' in str(res.headers)
         assert res.status_int == 200

@@ -234,45 +234,48 @@ def form_edit(db_model, form, template, form2=False):
             utils.model_to_form(model, form)
         # 提交修改
         if request.method == 'POST':
-            if form.validate_on_submit():
-                # 如果业务状态为禁用，则不允许操作
-                if db_model == TaskMonitor or db_model == BusinessNotifier:
-                    biz_status = Business.select().join(db_model).where(Business.id == bid).get().status
-                    if not biz_status:
-                        flash('关联业务为禁用状态')
-                        return redirect(url_for(redirect_path_edit))
-                # 如果是指定model，则记录表单提交前指定字段值
-                if db_model == Business or db_model == TaskMonitor:
-                    status_new = form.status.data
-                if db_model == User:
-                    admin_new = form.admin.data
-                # 提交数据
-                utils.form_to_model(form, model)
-                model.save()
-                # 如果业务状态从启用变为禁用，则对应的所有监控任务会被禁用
-                if db_model == Business:
-                    if status_old != status_new and status_new is False:
-                        toupdate = (TaskMonitor.update({TaskMonitor.status: False}).where(TaskMonitor.business == id))
-                        toupdate.execute()
-                # 如果监控任务状态从启用变为禁用，则对应的告警状态会被重置
-                if db_model == TaskMonitor:
-                    if status_old != status_new and status_new is False:
-                        toupdate = (TaskMonitor.update({TaskMonitor.warning: False}).where(TaskMonitor.id == id))
-                        toupdate.execute()
-                # 如果修改用户角色，则进行关联表相关操作
-                # 如果从业务管理员到系统管理员，则将perm_list修改为0
-                if db_model == User and admin_old != admin_new:
-                    if admin_new is True:
-                        toupdate = (Permission.update({Permission.perm_list: '0'}).where(Permission.perm_user == id))
-                        toupdate.execute()
-                # 如果从系统管理员到业务管理员，则将perm_list修改为空值
-                    else:
-                        toupdate = (Permission.update({Permission.perm_list: ''}).where(Permission.perm_user == id))
-                        toupdate.execute()
-                flash('修改成功')
-                return redirect(url_for(redirect_path_edit))
-            else:
-                utils.flash_errors(form)
+            try:
+                if form.validate_on_submit():
+                    # 如果业务状态为禁用，则不允许操作
+                    if db_model == TaskMonitor or db_model == BusinessNotifier:
+                        biz_status = Business.select().join(db_model).where(Business.id == bid).get().status
+                        if not biz_status:
+                            flash('关联业务为禁用状态')
+                            return redirect(url_for(redirect_path_edit))
+                    # 如果是指定model，则记录表单提交前指定字段值
+                    if db_model == Business or db_model == TaskMonitor:
+                        status_new = form.status.data
+                    if db_model == User:
+                        admin_new = form.admin.data
+                    # 提交数据
+                    utils.form_to_model(form, model)
+                    model.save()
+                    # 如果业务状态从启用变为禁用，则对应的所有监控任务会被禁用
+                    if db_model == Business:
+                        if status_old != status_new and status_new is False:
+                            toupdate = (TaskMonitor.update({TaskMonitor.status: False}).where(TaskMonitor.business == id))
+                            toupdate.execute()
+                    # 如果监控任务状态从启用变为禁用，则对应的告警状态会被重置
+                    if db_model == TaskMonitor:
+                        if status_old != status_new and status_new is False:
+                            toupdate = (TaskMonitor.update({TaskMonitor.warning: False}).where(TaskMonitor.id == id))
+                            toupdate.execute()
+                    # 如果修改用户角色，则进行关联表相关操作
+                    # 如果从业务管理员到系统管理员，则将perm_list修改为0
+                    if db_model == User and admin_old != admin_new:
+                        if admin_new is True:
+                            toupdate = (Permission.update({Permission.perm_list: '0'}).where(Permission.perm_user == id))
+                            toupdate.execute()
+                    # 如果从系统管理员到业务管理员，则将perm_list修改为空值
+                        else:
+                            toupdate = (Permission.update({Permission.perm_list: ''}).where(Permission.perm_user == id))
+                            toupdate.execute()
+                    flash('修改成功')
+                    return redirect(url_for(redirect_path_edit))
+                else:
+                    utils.flash_errors(form)
+            except peewee.IntegrityError as e:
+                flash(e)
     # 新增操作（id不存在）
     else:
         # 如果form2存在，则将form替换成form2，目前限于2种表单操作（业务联系人和任务表单）
