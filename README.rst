@@ -209,6 +209,22 @@ API调用
 
 压力测试
 ~~~~~~~~
+-  配置调整
+
+uwsgi相关配置
+
+| [uwsgi]
+| listen=10240
+| processes=8
+| gevent=100
+
+系统相关配置
+
+.. code:: bash
+
+        # echo 'net.core.somaxconn=4096' >> /etc/sysctl.conf
+
+-  压测表现
 
 使用ab对监控链接进行压力测试，10000并发无错误（目前只测试到10000并发，未测试更高并发），客户端和服务端网络延迟在11ms左右：
 
