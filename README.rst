@@ -207,6 +207,17 @@ API调用
 .. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/createNewTable.png
 .. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/alterCurrentTable.png
 
+压力测试
+~~~~~~~~
+
+使用ab对监控链接进行压力测试，10000并发无错误（目前只测试到10000并发，未测试更高并发），客户端和服务端网络延迟在11ms左右：
+
+.. code:: bash
+
+        $ ab -n 50000 -c 10000 https://cronmon.yoursite.com/api/monlink/ba60afc4-f162-11e8-a56a-001b7872e686
+
+.. image:: https://raw.githubusercontent.com/bruceye777/cronmon/master/docs/images/abStressTest.png
+
 贡献
 ~~~~
 

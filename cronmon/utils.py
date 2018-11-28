@@ -87,10 +87,7 @@ def flash_errors(form):
 
     for field, errors in form.errors.items():
         for error in errors:
-            flash("字段 [%s] 格式有误,错误原因: %s" % (
-                getattr(form, field).label.text,
-                error
-            ))
+            flash("字段 [%s] 格式有误,错误原因: %s" % (getattr(form, field).label.text, error))
 
 
 # 验证码生成
