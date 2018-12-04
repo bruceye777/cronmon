@@ -13,7 +13,11 @@ cronmon 是一个计划任务（定时任务）监控系统，可以对循环执
 .. image:: https://coveralls.io/repos/github/bruceye777/cronmon/badge.svg?branch=master
     :target: https://coveralls.io/github/bruceye777/cronmon?branch=master
 
-|PyPI version| |PyPI versions|
+.. image:: https://badge.fury.io/py/cronmonweb.svg
+    :target: https://badge.fury.io/py/cronmonweb
+
+.. image:: https://img.shields.io/pypi/pyversions/cronmonweb.svg
+    :target: https://pypi.python.org/pypi/cronmonweb/
 
 安装
 ~~~~
